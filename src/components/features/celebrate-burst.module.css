@@ -1,0 +1,75 @@
+.burst {
+  position: absolute;
+  inset: 0;
+}
+
+.arm {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 0;
+  block-size: 0;
+}
+
+.arm:nth-child(2) {
+  rotate: 45deg;
+}
+
+.arm:nth-child(3) {
+  rotate: 90deg;
+}
+
+.arm:nth-child(4) {
+  rotate: 135deg;
+}
+
+.arm:nth-child(5) {
+  rotate: 180deg;
+}
+
+.arm:nth-child(6) {
+  rotate: 225deg;
+}
+
+.arm:nth-child(7) {
+  rotate: 270deg;
+}
+
+.arm:nth-child(8) {
+  rotate: 315deg;
+}
+
+.dot {
+  --burst-dot-size: 0.4375rem;
+
+  display: block;
+  inline-size: var(--burst-dot-size);
+  block-size: var(--burst-dot-size);
+  margin-inline-start: calc(var(--burst-dot-size) / -2);
+  border-radius: 50%;
+  background-color: var(--color-progress);
+  opacity: 0;
+  animation: burst var(--motion-spatial-slow);
+}
+
+.arm:nth-child(even) .dot {
+  background-color: var(--color-highlight-mark);
+}
+
+@keyframes burst {
+  from {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  to {
+    opacity: 0;
+    translate: 0 -3.875rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    animation: none;
+  }
+}

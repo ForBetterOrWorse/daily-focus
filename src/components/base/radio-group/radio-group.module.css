@@ -1,0 +1,209 @@
+.group {
+  display: grid;
+  gap: var(--space-xxs);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  float: inline-start;
+  inline-size: 100%;
+  padding: 0;
+  font-size: var(--text-md);
+  line-height: 1.5rem;
+  color: var(--color-fg-primary);
+}
+
+.required {
+  color: var(--color-fg-secondary);
+}
+
+.hint,
+.error,
+.description {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.25rem;
+}
+
+.hint,
+.description {
+  color: var(--color-fg-secondary);
+}
+
+/* The negative margin cancels the group's row gap, which moves inside the clip so a collapsed error takes no space. */
+.error {
+  display: grid;
+  grid-template-rows: 1fr;
+  margin-block-start: calc(-1 * var(--space-xxs));
+  color: var(--color-danger);
+  animation:
+    error-grow var(--motion-spatial-fast),
+    error-fade var(--transition-base);
+}
+
+.error-clip {
+  display: block;
+  min-block-size: 0;
+  overflow: clip;
+}
+
+.error-body {
+  display: flex;
+  align-items: start;
+  gap: var(--space-xxs);
+  padding-block-start: var(--space-xxs);
+}
+
+/* The exit is shorter than the entrance. Rows and opacity share one duration; opacity ending unmounts the error. */
+.leaving {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  animation: none;
+  transition:
+    grid-template-rows var(--motion-exit),
+    opacity var(--motion-exit);
+}
+
+/* As tall as one line of error text, so the 1rem-wide icon centers on the first line. */
+.error-icon {
+  flex-shrink: 0;
+  inline-size: 1rem;
+  block-size: 1.25rem;
+}
+
+.option {
+  display: grid;
+}
+
+.radio {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--space-sm);
+  min-block-size: var(--control-height-md);
+  cursor: pointer;
+}
+
+.input {
+  --halo: 0 0 0 0 transparent;
+
+  appearance: none;
+  display: inline-grid;
+  flex-shrink: 0;
+  place-content: center;
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  margin: 0;
+  border: 1px solid var(--color-fg-primary);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-bg-primary);
+  box-shadow:
+    0 var(--depth-lip-small) 0 var(--color-fg-primary),
+    var(--halo);
+  cursor: inherit;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.input::before {
+  content: '';
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-state);
+  scale: 0;
+  transition: scale var(--motion-spatial-fast);
+}
+
+.input:checked {
+  border-width: 2px;
+  border-color: var(--color-state);
+  box-shadow:
+    0 var(--depth-lip-small) 0 var(--color-state),
+    var(--halo);
+}
+
+.input:checked::before {
+  scale: 1;
+}
+
+.label {
+  font-size: var(--text-md);
+  line-height: 1.5rem;
+  color: var(--color-fg-primary);
+}
+
+.description {
+  /* The row is control-height tall, so pull the text up to sit under its label. */
+  margin-block-start: calc((var(--control-height-md) - 1.5rem) / -2);
+  padding-inline-start: calc(1.125rem + var(--space-sm));
+}
+
+.radio:has(.input[aria-disabled='true']) {
+  cursor: not-allowed;
+}
+
+.input[aria-disabled='true'] {
+  border-color: var(--color-fg-disabled);
+  background-color: var(--color-bg-secondary);
+  box-shadow: none;
+}
+
+.input[aria-disabled='true']::before {
+  background-color: var(--color-fg-disabled);
+}
+
+.radio:has(.input[aria-disabled='true']) .label {
+  color: var(--color-fg-disabled);
+}
+
+.radio:hover .input:not([aria-disabled='true']) {
+  --halo: 0 0 0 0.25rem var(--color-hover);
+}
+
+.radio:hover .input:not([aria-disabled='true'], :checked) {
+  background-color: var(--color-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input {
+    transition:
+      background-color var(--transition-fast),
+      border-color var(--transition-fast),
+      box-shadow var(--transition-fast);
+  }
+
+  .input::before {
+    transition: none;
+  }
+}
+
+@keyframes error-grow {
+  from {
+    grid-template-rows: 0fr;
+  }
+}
+
+@keyframes error-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The space snaps; the message cross-fades. */
+@media (prefers-reduced-motion: reduce) {
+  .error {
+    animation: error-fade var(--transition-fast);
+  }
+
+  /* The space holds while the content fades and goes when it unmounts, so nothing vanishes first. */
+  .leaving {
+    grid-template-rows: 1fr;
+    transition: opacity var(--transition-fast);
+  }
+}

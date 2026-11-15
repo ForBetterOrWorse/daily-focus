@@ -1,0 +1,109 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--motion-spatial-base),
+    visibility 0s linear 500ms;
+}
+
+.reveal[data-open] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows var(--motion-spatial-base);
+}
+
+.reveal-inner {
+  min-block-size: 0;
+  overflow: hidden;
+  opacity: 0;
+  translate: 0 -0.75rem;
+  transition:
+    opacity var(--transition-base),
+    translate var(--motion-spatial-base);
+}
+
+.reveal[data-open] .reveal-inner {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.reveal-content {
+  padding-block-start: var(--space-sm);
+  padding-inline: var(--space-xxs);
+}
+
+.breakdown {
+  display: grid;
+  gap: var(--space-xxs);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--radius);
+  background-color: var(--color-bg-primary);
+}
+
+.title {
+  margin: 0;
+  font-size: inherit;
+  font-weight: 700;
+}
+
+.title:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  color: var(--color-fg-secondary);
+  font-size: var(--text-xs);
+  list-style: none;
+}
+
+.line {
+  margin: 0;
+  color: var(--color-fg-secondary);
+  font-size: var(--text-xs);
+}
+
+.banner-action {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--control-min-target);
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.banner-action:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal[data-open] {
+    transition:
+      grid-template-rows var(--transition-fast),
+      visibility var(--transition-fast);
+  }
+
+  .reveal-inner,
+  .reveal[data-open] .reveal-inner {
+    translate: 0 0;
+    transition: opacity var(--transition-fast);
+  }
+}

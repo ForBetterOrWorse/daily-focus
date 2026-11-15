@@ -1,0 +1,95 @@
+.main {
+  display: grid;
+  gap: var(--space-lg);
+  padding-block: var(--space-lg) var(--space-4xl);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+/* In-page wayfinding: a wrapping row on phones, a sticky list beside the sections on desktop. */
+.toc-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xxs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.toc-link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--control-min-target);
+  padding-inline: var(--space-sm);
+  border-radius: var(--radius-pill);
+  color: var(--color-fg-secondary);
+  font-size: var(--text-xs);
+  text-decoration: none;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.toc-link[aria-current='location'] {
+  background-color: var(--color-accent-container);
+  color: var(--color-fg-primary);
+  font-weight: 500;
+}
+
+.toc-link:hover {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-fg-primary);
+}
+
+.sections {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--space-md);
+}
+
+.section {
+  min-inline-size: 0;
+  gap: var(--space-md);
+}
+
+.fields {
+  display: grid;
+  gap: var(--space-md);
+}
+
+/* A field with a hint or error is taller than its neighbors. Packing rows at the start keeps every label and control on one line instead of spreading the extra height between them. */
+.fields > * {
+  align-content: start;
+}
+
+@media (min-width: 600px) {
+  .fields {
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .main {
+    grid-template-columns: 12rem minmax(0, 48rem);
+    column-gap: var(--space-3xl);
+  }
+
+  .title {
+    grid-column: 1 / -1;
+  }
+
+  .toc {
+    position: sticky;
+    inset-block-start: var(--space-lg);
+    align-self: start;
+  }
+
+  .toc-list {
+    flex-direction: column;
+  }
+}

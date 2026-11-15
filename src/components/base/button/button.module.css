@@ -1,0 +1,256 @@
+.button {
+  --face: transparent;
+  --face-transition: var(--transition-fast);
+  --edge: transparent;
+  --edge-width: 1px;
+  --edge-ring-width: var(--edge-width);
+  --lip-color: transparent;
+  --button-press-transition: 0.1s linear;
+  --button-height: var(--control-height-md);
+  --button-icon-size: var(--button-icon-size-md);
+
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* The face is the control height; the Tactile lip sits below it. */
+  min-block-size: calc(var(--button-height) + var(--depth-lip));
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  line-height: 1.25rem;
+  gap: var(--space-xs);
+  padding-inline: var(--space-md);
+  padding-block: 0;
+  border: var(--edge-width) solid transparent;
+  border-block-end-width: calc(var(--edge-width) + var(--depth-lip));
+  border-radius: var(--radius-button);
+  background: none;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition:
+    border-radius var(--motion-spatial-fast),
+    translate var(--motion-spatial-fast),
+    color var(--face-transition);
+}
+
+.button::before {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--edge-width));
+  z-index: -1;
+  border-radius: inherit;
+  background-color: var(--face);
+  box-shadow:
+    inset 0 0 0 var(--edge-ring-width) var(--edge),
+    0 var(--depth-lip) 0 var(--lip-color);
+  transition:
+    background-color var(--face-transition),
+    box-shadow var(--motion-spatial-fast);
+}
+
+/* Grows the hit area to --control-min-target around a shorter face. */
+.button::after {
+  content: '';
+  position: absolute;
+  inset-block: min(0px, calc((100% - var(--control-min-target)) / 2));
+  inset-inline: min(0px, calc((100% - var(--control-min-target)) / 2));
+}
+
+.sm {
+  --button-height: var(--control-height-sm);
+  --button-icon-size: var(--button-icon-size-sm);
+
+  font-size: var(--text-xs);
+  line-height: 1rem;
+  padding-inline: var(--space-sm);
+}
+
+.lg {
+  --button-height: var(--control-height-lg);
+  --button-icon-size: var(--button-icon-size-lg);
+
+  font-size: var(--text-md);
+  line-height: 1.5rem;
+  padding-inline: var(--space-lg);
+}
+
+.round {
+  --radius-button: var(--radius-button-round);
+  --radius-button-pressed: var(--radius-button-round);
+}
+
+.icon {
+  flex: none;
+  inline-size: var(--button-icon-size);
+  block-size: var(--button-icon-size);
+}
+
+.icon-only {
+  inline-size: calc(var(--button-height) + var(--depth-lip));
+  padding-inline: 0;
+}
+
+.button.borderless {
+  --edge: transparent;
+  --lip-color: transparent;
+  --depth-lip: 0rem;
+}
+
+.primary {
+  --face: var(--button-secondary-face);
+  --edge: var(--button-secondary-edge);
+  --lip-color: var(--color-fg-primary);
+
+  color: var(--color-fg-primary);
+}
+
+.primary:is(:hover, :active, [aria-expanded='true']):not([aria-disabled='true']) {
+  --face: var(--color-fg-primary);
+
+  color: var(--color-bg-tertiary);
+}
+
+/* A toggle (`aria-pressed`) shows "on" with the state fill and a 2px state edge, the same as a
+   chosen PillGroup pill. The ring widens inside the face, so the button keeps its size.
+   Hovers lay the label color over the face, so an unpressed hover never looks pressed. */
+.primary[aria-pressed='true'] {
+  --face: var(--color-state-fill);
+  --edge: var(--color-state-edge);
+  --edge-ring-width: 2px;
+  --lip-color: oklch(from var(--color-state-fill) calc(l - 0.1) c h);
+
+  color: var(--color-state-fg);
+  font-weight: 500;
+}
+
+/* The disabled label fails on the state fill, so a disabled pressed toggle goes gray. */
+.primary[aria-pressed='true'][aria-disabled='true'] {
+  --face: var(--color-bg-quaternary);
+  --edge: var(--button-pressed-disabled-edge);
+  --lip-color: transparent;
+
+  /* The pressed face is bg-quaternary, where fg-disabled falls under 4.5:1. */
+  color: var(--color-fg-tertiary);
+}
+
+.primary[aria-pressed='true']:is(:hover, :active):not([aria-disabled='true']) {
+  --face: color-mix(
+    in oklab,
+    var(--color-state-fg) var(--state-hover-layer),
+    var(--color-state-fill)
+  );
+
+  color: var(--color-state-fg);
+}
+
+.primary[aria-pressed='false']:is(:hover, :active):not([aria-disabled='true']) {
+  --face: color-mix(in oklab, var(--color-fg-primary) 8%, var(--button-secondary-face));
+
+  color: var(--color-fg-primary);
+}
+
+.ghost {
+  --face: transparent;
+  --edge: transparent;
+  --lip-color: transparent;
+  --depth-lip: 0rem;
+
+  color: var(--color-fg-primary);
+}
+
+.ghost:is(:hover, [aria-expanded='true']):not([aria-disabled='true']) {
+  --face: var(--color-hover);
+}
+
+.ghost:is(:active, [data-pressed]):not([aria-disabled='true']) {
+  --face: var(--color-bg-quaternary);
+}
+
+.danger {
+  --face: var(--color-bg-tertiary);
+  --edge: var(--color-danger);
+  --lip-color: var(--color-danger);
+
+  color: var(--color-danger);
+}
+
+.danger:is(:hover, :active):not([aria-disabled='true']) {
+  --face: var(--color-danger);
+
+  color: var(--color-bg-tertiary);
+}
+
+.cta {
+  --face: var(--color-accent);
+  --edge-width: 0px;
+  --lip-color: oklch(from var(--color-accent) calc(l - 0.1) c h);
+
+  color: var(--color-accent-fg);
+}
+
+/* A disabled button drops its ink or danger edge and its lip for the soft edge, so it cannot pass
+   for an enabled one. A disabled pressed toggle keeps the edge set above. */
+.primary[aria-disabled='true']:not([aria-pressed='true'], .borderless),
+.danger[aria-disabled='true']:not(.borderless) {
+  --edge: var(--color-border-secondary);
+  --lip-color: transparent;
+}
+
+/* The disabled label fails on the accent, so a disabled CTA goes gray. */
+.cta[aria-disabled='true'] {
+  --face: var(--color-bg-tertiary);
+  --lip-color: transparent;
+}
+
+.cta:hover:not([aria-disabled='true']) {
+  --face: var(--color-accent-hover);
+}
+
+.cta:active:not([aria-disabled='true']) {
+  --face: var(--color-accent-active);
+}
+
+.button[aria-disabled='true'] {
+  color: var(--color-fg-disabled);
+  cursor: not-allowed;
+}
+
+.button:is(:active, [data-pressed]):not([aria-disabled='true']) {
+  border-radius: var(--radius-button-pressed);
+  translate: 0 var(--depth-lip);
+  transition:
+    border-radius var(--motion-spatial-fast),
+    translate var(--button-press-transition),
+    color var(--face-transition);
+}
+
+.button:is(:active, [data-pressed]):not([aria-disabled='true'])::before {
+  box-shadow:
+    inset 0 0 0 var(--edge-ring-width) var(--edge),
+    0 0 0 var(--lip-color);
+  transition:
+    background-color var(--face-transition),
+    box-shadow 0.1s linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Selectors match the press rules' specificity, or those rules win. */
+  .button,
+  .button:is(:active, [data-pressed]):not([aria-disabled='true']) {
+    transition: color var(--transition-fast);
+  }
+
+  .button::before,
+  .button:is(:active, [data-pressed]):not([aria-disabled='true'])::before {
+    transition:
+      background-color var(--transition-fast),
+      box-shadow var(--transition-fast);
+  }
+
+  .button:is(:active, [data-pressed]):not([aria-disabled='true']) {
+    translate: none;
+  }
+}

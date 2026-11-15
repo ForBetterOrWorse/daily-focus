@@ -1,0 +1,70 @@
+import { useAltLabel, useCmdLabel } from '@/hooks/use-platform-modifier';
+import styles from './kbd-combo.module.css';
+
+export interface KbdComboProps {
+  /** Ordered key labels. 'Alt' resolves to the platform alt label; 'Cmd' to the platform modifier. */
+  keys: string[];
+  /** Extra class applied to the wrapper span for context-specific overrides. */
+  className?: string;
+  /**
+   * When true, always render a `+` separator between keys, even when the
+   * preceding key is a non-ASCII symbol. Use in contexts like the shortcuts
+   * modal where the chips must always be visually separated.
+   */
+  separateAll?: boolean;
+  /** Omit separators and use compact keycaps for hints. */
+  minimal?: boolean;
+}
+
+/** A non-ASCII symbol key (e.g. ⌥, ⌘) has no plus separator before the next key. */
+function isSymbolKey(resolved: string): boolean {
+  return resolved.length === 1 && resolved.charCodeAt(0) > 127;
+}
+
+/**
+ * Renders an inline keyboard shortcut as a row of `<kbd>` chips joined by `+` separators,
+ * except when the preceding key is a single non-ASCII symbol (⌥, ⌘). Resolves 'Alt' and 'Cmd'
+ * to platform-specific labels. Use minimal for compact hints. Hidden below 768px on pointer devices.
+ */
+export function KbdCombo({ keys, className, separateAll = false, minimal = false }: KbdComboProps) {
+  const altLabel = useAltLabel();
+  const cmdLabel = useCmdLabel();
+
+  function resolveKey(key: string): string {
+    if (key === 'Alt') {
+      return altLabel;
+    }
+    if (key === 'Cmd') {
+      return cmdLabel;
+    }
+    return key;
+  }
+
+  const resolved = keys.map(resolveKey);
+
+  return (
+    <span
+      className={`${styles.combo}${minimal ? ` ${styles.minimal}` : ''}${className ? ` ${className}` : ''}`}
+    >
+      {resolved.map((label, index) => (
+        <span key={keys[index]}>
+          {!minimal && index > 0 && (separateAll || !isSymbolKey(resolved[index - 1])) ? (
+            <span className={styles.plus}>+</span>
+          ) : null}
+          <kbd
+            className={
+              [
+                label.length === 1 ? styles['kbd-square'] : undefined,
+                isSymbolKey(label) ? styles['kbd-symbol'] : undefined,
+              ]
+                .filter(Boolean)
+                .join(' ') || undefined
+            }
+          >
+            {label}
+          </kbd>
+        </span>
+      ))}
+    </span>
+  );
+}

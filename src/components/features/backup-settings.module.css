@@ -1,0 +1,85 @@
+.meta {
+  margin: 0;
+  color: var(--color-fg-secondary);
+}
+
+.slot {
+  margin-block-start: calc(-1 * var(--space-md));
+  transition: margin-block-start var(--motion-spatial-base);
+}
+
+.slot[data-open] {
+  margin-block-start: 0;
+}
+
+.fold {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--motion-spatial-base),
+    visibility 0s linear 500ms;
+}
+
+.slot[data-open] .fold {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows var(--motion-spatial-base);
+}
+
+.inner {
+  min-block-size: 0;
+  overflow: hidden;
+  opacity: 0;
+  translate: 0 -0.75rem;
+  transition:
+    opacity var(--transition-base),
+    translate var(--motion-spatial-base);
+}
+
+.slot[data-open] .inner {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.result,
+.error {
+  margin: 0;
+}
+
+.result {
+  color: var(--color-fg-secondary);
+}
+
+.error {
+  display: flex;
+  align-items: start;
+  gap: var(--space-xxs);
+  color: var(--color-danger);
+}
+
+.error-icon {
+  flex-shrink: 0;
+  inline-size: 1rem;
+  block-size: 1.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slot,
+  .slot[data-open] {
+    transition: margin-block-start var(--transition-fast);
+  }
+
+  .fold,
+  .slot[data-open] .fold {
+    transition:
+      grid-template-rows var(--transition-fast),
+      visibility var(--transition-fast);
+  }
+
+  .inner,
+  .slot[data-open] .inner {
+    translate: 0 0;
+    transition: opacity var(--transition-fast);
+  }
+}

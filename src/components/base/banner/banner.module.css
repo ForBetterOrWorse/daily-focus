@@ -1,0 +1,89 @@
+.root {
+  display: grid;
+  grid-template-rows: 1fr;
+  animation:
+    banner-grow var(--motion-spatial-fast),
+    banner-fade var(--transition-base);
+}
+
+.clip {
+  min-block-size: 0;
+  overflow: clip;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-block: var(--space-sm);
+  padding-inline: var(--space-md);
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+.content {
+  flex: 1;
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: var(--line-height-caption);
+}
+
+.dismiss {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  block-size: var(--icon-button-size);
+  inline-size: var(--icon-button-size);
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  border-radius: var(--radius);
+  transition: background-color var(--transition-fast);
+}
+
+.dismiss:hover {
+  background-color: color-mix(in srgb, currentcolor 15%, transparent);
+}
+
+.dismiss:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* The exit is shorter than the entrance. Rows and opacity share one duration; opacity ending calls onDismiss. */
+.leaving {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  animation: none;
+  transition:
+    grid-template-rows var(--motion-exit),
+    opacity var(--motion-exit);
+}
+
+@keyframes banner-grow {
+  from {
+    grid-template-rows: 0fr;
+  }
+}
+
+@keyframes banner-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The space snaps; the banner cross-fades. */
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    animation: banner-fade var(--transition-fast);
+  }
+
+  /* The space holds while the content fades and goes when it unmounts, so nothing vanishes first. */
+  .leaving {
+    grid-template-rows: 1fr;
+    transition: opacity var(--transition-fast);
+  }
+}

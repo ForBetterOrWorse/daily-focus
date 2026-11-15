@@ -1,0 +1,45 @@
+/*
+ * A small orange drop sits behind the number, offset down and toward the start like a misregistered
+ * print. Ink over it stays readable: light uses the Save button orange (5.4:1), dark the deeper
+ * tangerine tone (3.6:1, large text).
+ */
+.streak {
+  --streak-blob: light-dark(var(--color-brand-cta), var(--tangerine-state));
+  --streak-size: 3rem;
+
+  flex: none;
+  color: var(--color-fg-primary);
+}
+
+/* No streak yet: the drop waits in gray and turns orange on day one. */
+.streak[data-zero] {
+  --streak-blob: var(--color-border-secondary);
+}
+
+/* "days" sits on the number's baseline. The stacking context sits on the whole line so the drop
+   paints behind "days" too. */
+.text {
+  display: inline-block;
+  isolation: isolate;
+  font-size: var(--text-lg);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.count {
+  position: relative;
+  font-size: var(--streak-size);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.blob {
+  position: absolute;
+  z-index: -1;
+  inset-block-start: 0.3em;
+  inset-inline-start: max(0.05em, calc(100% - 0.765em));
+  inline-size: 0.95em;
+  block-size: 0.8em;
+  fill: var(--streak-blob);
+}

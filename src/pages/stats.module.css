@@ -1,0 +1,12 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding-block: var(--space-lg) var(--space-4xl);
+}
+
+.activity {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}

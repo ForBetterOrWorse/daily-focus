@@ -1,0 +1,94 @@
+.activity {
+  --cell-size: 0.75rem;
+  --cell-gap: 0.1875rem;
+  --grid-0: var(--color-bg-quaternary);
+  --grid-1: color-mix(in oklch, var(--color-progress) 30%, var(--color-bg-primary));
+  --grid-2: color-mix(in oklch, var(--color-progress) 55%, var(--color-bg-primary));
+  --grid-3: color-mix(in oklch, var(--color-progress) 80%, var(--color-bg-primary));
+  --grid-4: var(--color-progress);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-inline-size: 0;
+}
+
+.activity:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.scroll {
+  overflow-x: auto;
+  padding: var(--space-xxs);
+}
+
+.grid {
+  display: flex;
+  gap: var(--cell-gap);
+  min-inline-size: 100%;
+  inline-size: max-content;
+}
+
+.week {
+  display: flex;
+  flex: 1 0 var(--cell-size);
+  flex-direction: column;
+  gap: var(--cell-gap);
+}
+
+.month {
+  block-size: 0.875rem;
+  inline-size: 0;
+  color: var(--color-fg-tertiary);
+  font-size: var(--text-2xs);
+  line-height: 0.875rem;
+  white-space: nowrap;
+}
+
+.cell {
+  inline-size: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background-color: var(--grid-0);
+  cursor: pointer;
+}
+
+.cell[data-future] {
+  background-color: transparent;
+  cursor: default;
+}
+
+.cell[data-level='1'] {
+  background-color: var(--grid-1);
+}
+
+.cell[data-level='2'] {
+  background-color: var(--grid-2);
+}
+
+.cell[data-level='3'] {
+  background-color: var(--grid-3);
+}
+
+.cell[data-level='4'] {
+  background-color: var(--grid-4);
+}
+
+.cell[aria-pressed='true'] {
+  outline: 2px solid var(--color-state);
+  outline-offset: 0;
+}
+
+.cell:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 0;
+}

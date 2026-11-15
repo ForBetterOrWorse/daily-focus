@@ -1,0 +1,112 @@
+/*
+ * The row always holds its height so the card never resizes. When Focus sessions is chosen, each
+ * pair springs in from the start, one after another. It fades out faster and without the stagger.
+ */
+.reveal {
+  display: flex;
+  justify-content: center;
+  block-size: var(--session-row-block);
+}
+
+/*
+ * Completed sessions stay green; the current session is tangerine. Keep the colors separate,
+ * since blending them reads olive brown.
+ */
+.row {
+  --session-done: var(--color-progress);
+  --session-current: var(--color-highlight-mark);
+  --session-edge: color-mix(in oklch, var(--color-fg-primary) 45%, var(--color-current-item-bg));
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-block-size: 0;
+  padding-block: var(--space-xxs);
+  overflow: hidden;
+}
+
+.pair {
+  --pair-order: 0;
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-xxs);
+  opacity: 0;
+  scale: 0.4;
+  transition:
+    scale var(--motion-exit),
+    opacity var(--motion-exit);
+}
+.pair:nth-child(2) {
+  --pair-order: 1;
+}
+
+.pair:nth-child(3) {
+  --pair-order: 2;
+}
+
+.pair:nth-child(4) {
+  --pair-order: 3;
+}
+
+.reveal[data-open] .pair {
+  opacity: 1;
+  scale: 1;
+  transition:
+    scale var(--motion-spatial-fast) calc(var(--pair-order) * 70ms),
+    opacity var(--transition-fast) calc(var(--pair-order) * 70ms);
+}
+
+.focus {
+  inline-size: 2.25rem;
+  block-size: 0.75rem;
+  overflow: visible;
+}
+
+.leaf {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  overflow: visible;
+}
+
+.leaf[data-long] {
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+}
+
+.shape {
+  fill: none;
+  stroke: var(--session-edge);
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+
+[data-status='done'] .shape {
+  fill: var(--session-done);
+  stroke: var(--session-done);
+}
+
+[data-status='current'] .shape {
+  stroke: var(--session-current);
+  stroke-width: 2;
+}
+
+.leaf[data-status='current'] .shape {
+  fill: var(--session-current);
+}
+
+.fill {
+  fill: var(--session-current);
+  transition: width var(--trace-step, 1s linear);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal[data-open],
+  .pair,
+  .reveal[data-open] .pair,
+  .fill {
+    transition: none;
+  }
+}

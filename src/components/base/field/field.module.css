@@ -1,0 +1,110 @@
+.field {
+  display: grid;
+  gap: var(--space-xxs);
+  min-inline-size: 0;
+}
+
+.label {
+  justify-self: start;
+  font-size: var(--text-md);
+  line-height: 1.5rem;
+  color: var(--color-fg-primary);
+  transition: color var(--transition-fast);
+}
+
+.field:has([aria-invalid='true']) :is(.label, .required) {
+  color: var(--color-danger);
+}
+
+.required {
+  color: var(--color-fg-secondary);
+  transition: color var(--transition-fast);
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.25rem;
+  color: var(--color-fg-secondary);
+}
+
+/* The hint and the error share one grid cell, so the container holds the taller of the two and the text swaps in place. */
+.messages {
+  display: grid;
+}
+
+.messages > * {
+  grid-area: 1 / 1;
+}
+
+/* Hidden, not removed, so the cell keeps its height. */
+.hint[aria-hidden='true'] {
+  visibility: hidden;
+}
+
+/* Without a hint, the negative margin cancels the field's row gap, which moves inside the clip so a collapsed error takes no space. */
+.messages:not([data-hint]) {
+  margin-block-start: calc(-1 * var(--space-xxs));
+}
+
+.error {
+  display: grid;
+  grid-template-rows: 0fr;
+  font-size: var(--text-xs);
+  line-height: 1.25rem;
+  color: var(--color-danger);
+  opacity: 0;
+
+  /* The exit is shorter than the entrance. Rows and opacity share one duration; opacity ending unmounts the text. */
+  transition:
+    grid-template-rows var(--motion-exit),
+    opacity var(--motion-exit);
+}
+
+.error[data-open] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows var(--motion-spatial-fast),
+    opacity var(--transition-base);
+}
+
+/* With a hint the swap is instant, so the error shows at once in the hint's place. */
+.messages[data-hint] .error {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition: none;
+}
+
+.error-clip {
+  display: block;
+  min-block-size: 0;
+  overflow: clip;
+}
+
+.error-body {
+  display: flex;
+  align-items: start;
+  gap: var(--space-xxs);
+  padding-block-start: var(--space-xxs);
+}
+
+.messages[data-hint] .error-body {
+  padding-block-start: 0;
+}
+
+/* As tall as one line of error text, so the 1rem-wide icon centers on the first line. */
+.error-icon {
+  flex-shrink: 0;
+  inline-size: 1rem;
+  block-size: 1.25rem;
+}
+
+/* The space snaps; the message cross-fades. */
+@media (prefers-reduced-motion: reduce) {
+  .error,
+  .error[data-open] {
+    grid-template-rows: 1fr;
+    transition: opacity var(--transition-fast);
+  }
+}

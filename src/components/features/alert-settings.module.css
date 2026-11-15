@@ -1,0 +1,10 @@
+.root {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.prose {
+  max-inline-size: 60ch;
+  margin: 0;
+  color: var(--color-fg-secondary);
+}

@@ -1,0 +1,172 @@
+.group {
+  --pill-height: var(--control-height-md);
+  --pill-line-height: 1.25rem;
+  --pill-pad-resting: var(--space-md);
+  --pill-pad-chosen: var(--space-lg);
+  --pill-chosen-scale: 1.12;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  /* Room for the chosen pill to grow and overshoot without touching its neighbors. */
+  gap: var(--space-md);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.small {
+  --pill-height: var(--control-height-sm);
+  --pill-line-height: 1rem;
+  --pill-pad-resting: calc(var(--space-sm) + 1px);
+  --pill-pad-chosen: var(--space-md);
+
+  /* The tight gap leaves no room for a chosen pill to scale, so it grows through padding alone. */
+  --pill-chosen-scale: 1;
+
+  gap: var(--space-sm);
+}
+
+.legend {
+  padding: 0;
+  margin-block-end: var(--space-xs);
+  color: var(--color-fg-secondary);
+  font-size: var(--text-md);
+  line-height: 1.5rem;
+}
+
+.pill {
+  --pill-face: color-mix(in oklab, var(--color-fg-primary) 8%, transparent);
+  --pill-lip: color-mix(in oklab, var(--color-fg-primary) 30%, transparent);
+  --pill-fg: var(--color-fg-primary);
+  --pill-edge: transparent;
+  --pill-pad: var(--pill-pad-resting);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--pill-height);
+  margin-block-end: var(--depth-lip-small);
+  padding-inline: var(--pill-pad);
+  border-radius: var(--radius-pill-group);
+  background-color: var(--pill-face);
+  box-shadow:
+    inset 0 0 0 2px var(--pill-edge),
+    0 var(--depth-lip-small) 0 var(--pill-lip);
+  color: var(--pill-fg);
+  font-size: var(--text-xs);
+  line-height: var(--pill-line-height);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--motion-spatial-fast),
+    translate var(--motion-spatial-fast),
+    scale var(--motion-spatial-fast),
+    padding-inline var(--motion-spatial-fast);
+}
+
+.day {
+  --pill-pad: 0;
+
+  inline-size: var(--control-height-md);
+}
+
+.pill:hover {
+  background-color: color-mix(in oklab, var(--pill-fg) var(--state-hover-layer), var(--pill-face));
+}
+
+.pill:active {
+  box-shadow:
+    inset 0 0 0 2px var(--pill-edge),
+    0 0 0 var(--pill-lip);
+  translate: 0 var(--depth-lip-small);
+  scale: 0.9;
+  transition:
+    background-color var(--transition-fast),
+    box-shadow 0.1s linear,
+    translate 0.1s linear,
+    scale var(--motion-spatial-fast),
+    padding-inline var(--motion-spatial-fast);
+}
+
+.pill:has(.input:focus-visible) {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.input {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.pill:has(.input:checked) {
+  --pill-face: var(--color-state-fill);
+  --pill-lip: oklch(from var(--color-state-fill) calc(l - 0.1) c h);
+  --pill-fg: var(--color-state-fg);
+  --pill-edge: var(--color-state-edge);
+  --pill-pad: var(--pill-pad-chosen);
+
+  /* The chosen pill takes more room: wider, so its neighbors slide aside, and 12% larger overall.
+     Pressing squashes it first, so release springs it past its size and settles.
+     Standard eases in 80ms; Expressive and Tactile use the spatial spring. */
+  scale: var(--pill-chosen-scale);
+  font-weight: 500;
+}
+
+/* The edge sits on the face, so a chosen pill moves it with the face and no ring shows on hover. */
+.pill:has(.input:checked):hover {
+  --pill-edge: color-mix(in oklab, var(--pill-fg) var(--state-hover-layer), var(--pill-edge));
+}
+
+.icon {
+  flex: none;
+  inline-size: 1rem;
+  block-size: 1rem;
+  margin-inline-end: var(--space-xs);
+  overflow: hidden;
+  transition:
+    inline-size var(--motion-spatial-fast),
+    margin-inline-end var(--motion-spatial-fast),
+    opacity var(--transition-fast);
+}
+
+.pill:has(.input:checked) .icon {
+  inline-size: 0;
+  margin-inline-end: 0;
+  opacity: 0;
+}
+
+.day:has(.input:checked) {
+  --pill-pad: 0;
+}
+
+.pill:has(.input:checked):active {
+  scale: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon {
+    transition: opacity var(--transition-fast);
+  }
+
+  .pill {
+    transition:
+      background-color var(--transition-fast),
+      color var(--transition-fast),
+      box-shadow var(--transition-fast);
+  }
+
+  .pill:active {
+    transition:
+      background-color var(--transition-fast),
+      box-shadow var(--transition-fast);
+  }
+}

@@ -1,0 +1,24 @@
+.link {
+  color: var(--color-fg-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  transition: color var(--transition-fast);
+}
+
+.unadorned {
+  text-decoration: none;
+}
+
+.link:hover {
+  color: var(--color-accent-text);
+  text-decoration: none;
+}
+
+.link.unadorned:hover {
+  color: var(--color-fg-primary);
+}
+
+.link:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}

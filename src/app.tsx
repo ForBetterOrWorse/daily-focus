@@ -1,0 +1,72 @@
+import { useState } from 'react';
+import { Link, Route, Switch, useLocation } from 'wouter';
+import { FbowFooterCredit } from '@/components/base/navbar/footer-credit';
+import { Navbar } from '@/components/base/navbar/navbar';
+import {
+  ShortcutsModal,
+  type ShortcutEntry,
+} from '@/components/base/shortcuts-modal/shortcuts-modal';
+import { SkipLink } from '@/components/base/skip-link/skip-link';
+import { ToastProvider } from '@/components/base/toast/toast';
+import { LiveAnnouncerProvider } from './components/features/live-announcer';
+import { PhaseAlerts } from './components/features/phase-alerts';
+import { useShortcut } from './hooks/use-shortcut';
+import { useScrollToHash } from './hooks/use-scroll-to-hash';
+import { useTheme } from './hooks/use-theme';
+import { Settings } from './pages/settings';
+import { Stats } from './pages/stats';
+import { Today } from './pages/today';
+import styles from './app.module.css';
+
+const SHORTCUTS: ShortcutEntry[] = [
+  { keys: ['Shift', '/'], action: 'Show keyboard shortcuts' },
+  { keys: ['Shift', 'S'], action: 'Start or pause the timer' },
+  { keys: ['Shift', 'E'], action: 'Add a task' },
+  { keys: ['\\'], action: 'Show or hide Habits and Tasks (wide screens)' },
+];
+
+export function App() {
+  const [path] = useLocation();
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [opener, setOpener] = useState<HTMLElement | null>(null);
+  useTheme();
+  useScrollToHash();
+  useShortcut({ key: '/', shift: true }, (event) => {
+    event.preventDefault();
+    setOpener(document.activeElement instanceof HTMLElement ? document.activeElement : null);
+    setShortcutsOpen(true);
+  });
+  const navItems = [
+    { href: '/', label: 'Today' },
+    { href: '/stats', label: 'Stats' },
+    { href: '/settings', label: 'Settings' },
+  ].map((item) => ({ ...item, current: path === item.href }));
+
+  return (
+    <ToastProvider position="top-center">
+      <LiveAnnouncerProvider>
+        <div className={styles.app}>
+          <SkipLink targetId="main">Skip to main content</SkipLink>
+          <Navbar appName="Daily Focus" navItems={navItems} linkComponent={Link} />
+          <main id="main" tabIndex={-1} className={styles.main}>
+            <Switch>
+              <Route path="/" component={Today} />
+              <Route path="/stats" component={Stats} />
+              <Route path="/settings" component={Settings} />
+            </Switch>
+          </main>
+          <PhaseAlerts />
+          {path === '/settings' ? (
+            <FbowFooterCredit href="https://fbow.org" className={styles.footer} />
+          ) : null}
+          <ShortcutsModal
+            open={shortcutsOpen}
+            onClose={() => setShortcutsOpen(false)}
+            shortcuts={SHORTCUTS}
+            triggerElement={opener}
+          />
+        </div>
+      </LiveAnnouncerProvider>
+    </ToastProvider>
+  );
+}

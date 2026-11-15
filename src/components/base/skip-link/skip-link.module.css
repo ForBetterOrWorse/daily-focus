@@ -1,0 +1,29 @@
+.link {
+  composes: sr-only from global;
+}
+
+:global(.sr-only).link:focus,
+:global(.sr-only).link:focus-visible,
+:global(.sr-only).link.preview {
+  position: fixed;
+  inset-block-start: var(--space-sm);
+  inset-inline-start: var(--space-sm);
+  z-index: 250;
+  inline-size: auto;
+  block-size: auto;
+  margin: 0;
+  padding: var(--space-md) var(--space-lg);
+  overflow: visible;
+  clip-path: none;
+  white-space: normal;
+  border: 0;
+  border-radius: var(--radius);
+  background-color: var(--skip-link-background);
+  color: var(--skip-link-foreground);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  font-weight: 500;
+  line-height: 1.5;
+  outline: none;
+  text-decoration: none;
+}

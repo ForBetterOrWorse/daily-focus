@@ -1,0 +1,257 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+.overlay-closing {
+  pointer-events: none;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: var(--overlay-background-color);
+  animation: fade-in var(--transition-base);
+}
+
+.panel {
+  --drawer-padding-inline: var(--space-md);
+  --drawer-padding-block: var(--space-md);
+  --drawer-bottom-body-min: 8rem;
+  --color-hover: var(--color-hover-overlay);
+
+  position: fixed;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: min(26rem, 90vw);
+  display: flex;
+  flex-direction: column;
+  overflow: clip;
+  background-color: var(--surface-overlay);
+  border-inline-end: 1px solid var(--color-border-secondary);
+  box-shadow: var(--shadow-dialog);
+  animation: slide-in var(--motion-spatial-base);
+}
+
+.panel-end {
+  inset-inline: auto 0;
+  border-inline-end: 0;
+  border-inline-start: 1px solid var(--color-border-secondary);
+  animation-name: slide-in-end;
+}
+
+.panel-bottom {
+  --drawer-max-block-size: 85vh;
+
+  inset-block-start: auto;
+  inline-size: 100%;
+  max-block-size: var(--drawer-max-block-size);
+  border-inline-end: 0;
+  border-block-start: 1px solid var(--color-border-secondary);
+  animation-name: slide-in-bottom;
+}
+
+.header {
+  flex-shrink: 0;
+  border-block-end: 1px solid var(--color-border-secondary);
+  padding-block: var(--drawer-padding-block);
+  padding-inline: var(--drawer-padding-inline);
+}
+
+.header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.header-row + * {
+  margin-block-start: var(--space-md);
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.heading-inline {
+  flex-flow: row wrap;
+  align-items: baseline;
+  gap: var(--space-sm);
+}
+
+.title {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg);
+  margin-block: 0;
+}
+
+.close {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--control-height-sm);
+  block-size: var(--control-height-sm);
+  color: var(--color-fg-secondary);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.close::after {
+  content: '';
+  position: absolute;
+  inset-block: min(0px, calc((100% - var(--control-min-target)) / 2));
+  inset-inline: min(0px, calc((100% - var(--control-min-target)) / 2));
+}
+
+.close svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+}
+
+.close:hover {
+  color: var(--color-fg-primary);
+  background-color: var(--color-hover-overlay);
+}
+
+.body {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-block: var(--drawer-padding-block);
+  padding-inline: var(--drawer-padding-inline);
+}
+
+/* Negate the global offset so the outline renders inside the element.
+   The panel's overflow: clip would otherwise clip the outside ring. */
+.body:focus-visible {
+  outline-offset: calc(var(--focus-ring-offset) * -1);
+}
+
+.body-bottom {
+  min-block-size: var(--drawer-bottom-body-min);
+}
+
+.footer {
+  flex-shrink: 0;
+  border-block-start: 1px solid var(--color-border-secondary);
+  padding-block: var(--drawer-padding-block);
+  padding-inline: var(--drawer-padding-inline);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-end {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-bottom {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+.closing {
+  animation: slide-out var(--motion-exit) forwards;
+}
+
+.overlay-closing .backdrop {
+  animation: fade-out var(--motion-exit) forwards;
+}
+
+.panel-end.closing {
+  animation-name: slide-out-end;
+}
+
+.panel-bottom.closing {
+  animation-name: slide-out-bottom;
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-out-end {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slide-out {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes slide-out-bottom {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .panel,
+  .panel-end,
+  .panel-bottom {
+    animation: fade-in var(--transition-fast);
+  }
+
+  .overlay-closing .backdrop,
+  .closing,
+  .panel-end.closing,
+  .panel-bottom.closing {
+    animation: fade-out var(--transition-fast) forwards;
+  }
+}

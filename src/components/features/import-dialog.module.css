@@ -1,0 +1,20 @@
+.body {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.file {
+  display: grid;
+  gap: var(--space-xxs);
+  margin: 0;
+}
+
+.name {
+  overflow-wrap: anywhere;
+  font-weight: 600;
+}
+
+.summary {
+  color: var(--color-fg-secondary);
+  font-size: var(--text-xs);
+}

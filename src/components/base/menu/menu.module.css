@@ -1,0 +1,176 @@
+.root {
+  position: relative;
+  display: inline-block;
+}
+
+.chevron {
+  flex-shrink: 0;
+  inline-size: 0.875rem;
+  block-size: 0.875rem;
+  transition:
+    rotate var(--motion-spatial-fast),
+    translate var(--motion-spatial-fast);
+}
+
+.root > [aria-expanded='true'] .chevron {
+  rotate: 180deg;
+}
+
+.root:hover > [aria-expanded='false']:not([aria-disabled='true']) .chevron {
+  translate: 0 0.1875rem;
+}
+
+.icon-trigger {
+  min-inline-size: var(--control-min-target);
+  padding-inline: var(--space-xs);
+}
+
+.menu {
+  position: absolute;
+  inset-block-start: calc(100% + var(--space-xxs));
+  z-index: 50;
+  display: grid;
+  gap: var(--select-option-gap);
+  inline-size: max-content;
+  min-inline-size: 10rem;
+  max-inline-size: min(20rem, calc(100vw - 2 * var(--space-md)));
+  margin: 0;
+  padding: var(--select-list-padding);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--select-list-radius);
+  background-color: var(--surface-overlay);
+  box-shadow: var(--shadow-menu);
+  clip-path: inset(-1rem);
+  list-style: none;
+  transform-origin: top;
+}
+
+/* The list shape, row shape, and motion come from Select's tokens, so a Menu and a Select open
+   the same way in every mode. The list is usable at once; the unfurl is 0s in Standard. */
+.menu:not([hidden]) {
+  animation:
+    unfurl var(--select-unfurl),
+    menu-fade var(--transition-fast);
+}
+
+/* Closing fades the list and, in Expressive and Tactile, rolls it up toward the button.
+   allow-discrete holds display until the fade ends, and the list leaves the accessibility tree
+   and the pointer at once. The roll is 0s in Standard, so its delay holds the clip until the fade
+   has ended. The delay is 0s where the roll runs. */
+.menu[hidden] {
+  display: none;
+  clip-path: inset(-1rem -1rem 100% -1rem);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    clip-path var(--select-exit) var(--select-exit-clip-delay),
+    opacity var(--select-exit-fade),
+    display var(--select-exit-fade) allow-discrete;
+}
+
+.start {
+  inset-inline-start: 0;
+}
+
+.end {
+  inset-inline-end: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  inline-size: 100%;
+  min-block-size: var(--control-height-md);
+  padding-inline: var(--space-sm) var(--select-inset);
+  border: none;
+  border-radius: var(--select-radius);
+  background: none;
+  color: var(--color-fg-primary);
+  font-family: inherit;
+  font-size: var(--text-xs);
+  line-height: 1.25rem;
+  text-align: start;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.item:hover,
+.item:focus-visible {
+  background-color: var(--select-highlight);
+}
+
+.item:active {
+  background-color: var(--color-bg-quaternary);
+}
+
+.item:focus-visible {
+  outline-offset: -2px;
+}
+
+/* The check shows only on the current choice; the other items keep its space. */
+.check {
+  display: inline-flex;
+  flex: none;
+  margin-inline-end: var(--space-xs);
+  visibility: hidden;
+}
+
+.check[data-checked] {
+  visibility: visible;
+}
+
+.check svg,
+.item-icon svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+}
+
+.item-icon {
+  display: inline-flex;
+  flex: none;
+  margin-inline-end: var(--space-xs);
+}
+
+/* With item icons, the icon leads the row and the check moves to the end, matching Select. */
+.menu[data-icons] .check {
+  margin-inline: var(--space-md) 0;
+}
+
+.label {
+  flex: 1;
+}
+
+.danger {
+  color: var(--color-danger);
+}
+
+.item[aria-disabled='true'] {
+  background: none;
+  color: var(--color-fg-disabled);
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu:not([hidden]) {
+    animation: menu-fade var(--transition-fast);
+  }
+
+  .menu[hidden] {
+    clip-path: inset(-1rem);
+    transition:
+      opacity var(--transition-fast),
+      display var(--transition-fast) allow-discrete;
+  }
+}
+
+@keyframes menu-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes unfurl {
+  from {
+    scale: 1 0.6;
+  }
+}

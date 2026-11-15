@@ -1,0 +1,21 @@
+.footer-credit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-block-size: var(--footer-min-height);
+  padding-block: var(--space-sm);
+  padding-inline: var(--space-sm);
+  color: var(--color-fg-secondary);
+  font-size: var(--text-xs);
+}
+
+.mark {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  flex: none;
+}
+
+.copy {
+  margin: 0;
+}

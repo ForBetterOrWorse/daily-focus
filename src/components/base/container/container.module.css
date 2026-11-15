@@ -1,0 +1,40 @@
+/* A page override wins over the size class whatever the stylesheet order, and never leaks into a nested Container. */
+@property --container-max {
+  syntax: '*';
+  inherits: false;
+}
+
+.container {
+  --container-gutter: var(--space-md);
+
+  box-sizing: border-box;
+  max-inline-size: var(--container-max, var(--container-size, none));
+  margin-inline: auto;
+  padding-inline: var(--container-gutter);
+}
+
+@media (min-width: 600px) {
+  .container {
+    --container-gutter: var(--space-lg);
+  }
+}
+
+.full {
+  --container-size: none;
+}
+
+.sm {
+  --container-size: var(--container-sm);
+}
+
+.md {
+  --container-size: var(--container-md);
+}
+
+.lg {
+  --container-size: var(--container-lg);
+}
+
+.xl {
+  --container-size: var(--container-xl);
+}

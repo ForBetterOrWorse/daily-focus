@@ -1,0 +1,116 @@
+.columns-control {
+  --icon-pad: calc((var(--button-height) + var(--depth-lip) - var(--button-icon-size)) / 2);
+  --radius-button: var(--radius);
+  --radius-button-pressed: var(--radius);
+  --push: 500ms cubic-bezier(0.05, 0.7, 0.1, 1);
+
+  display: none;
+  position: fixed;
+  z-index: 1;
+  inset-block-end: var(--space-lg);
+  inset-inline-end: var(--space-md);
+  gap: 0;
+  white-space: nowrap;
+  transition:
+    border-radius var(--motion-spatial-fast),
+    translate var(--motion-spatial-fast),
+    padding-inline var(--push),
+    color var(--face-transition);
+}
+
+/* Anchored at the inline end, so shrinking pushes the button's start edge toward the end. */
+.columns-control.columns-control[data-variant='toggle'] {
+  --face: var(--color-bg-primary);
+  --edge: var(--color-border-primary);
+
+  padding-inline: var(--icon-pad);
+}
+
+.columns-control.columns-control[data-variant='toggle'][aria-expanded] {
+  color: var(--color-fg-primary);
+}
+
+.columns-control.columns-control[data-variant='toggle'][aria-expanded]:is(:hover, :active) {
+  --face: color-mix(in oklab, var(--color-fg-primary) 8%, var(--color-bg-primary));
+}
+
+.columns-glyph {
+  position: relative;
+}
+
+.columns-icon {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  transition: opacity var(--transition-base);
+}
+
+.columns-control[data-variant='toggle'] .columns-plus,
+.columns-control[data-variant='invite'] .columns-panel {
+  opacity: 0;
+}
+
+.columns-label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  transition:
+    grid-template-columns var(--push),
+    opacity var(--transition-fast);
+}
+
+.columns-label-text {
+  min-inline-size: 0;
+  padding-inline-start: var(--space-xs);
+  overflow: clip;
+}
+
+.columns-control[data-variant='toggle'] .columns-label {
+  grid-template-columns: minmax(0, 0fr);
+  opacity: 0;
+}
+
+.columns-pane {
+  --pane-glide: 500ms;
+
+  x: 5.5px;
+  y: 3.5px;
+  width: 5px;
+  height: 9px;
+  rx: 1px;
+  transition-property: x, y, width, height, rx;
+  transition-duration: var(--pane-glide);
+  transition-timing-function: cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+
+.columns-control[aria-expanded='true'] .columns-pane {
+  x: 0.5px;
+  y: 1.5px;
+  width: 7.5px;
+  height: 13px;
+  rx: 1.5px;
+}
+
+.columns-control .columns-icon:dir(rtl) {
+  scale: -1 1;
+}
+
+@media (min-width: 1024px) {
+  .columns-control {
+    display: inline-flex;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .columns-pane {
+    transition: none;
+  }
+
+  .columns-control {
+    transition: color var(--face-transition);
+  }
+
+  .columns-label {
+    transition: opacity var(--transition-base);
+  }
+}

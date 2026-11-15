@@ -1,0 +1,3 @@
+.region {
+  composes: sr-only from global;
+}

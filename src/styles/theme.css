@@ -1,0 +1,384 @@
+:root {
+  color-scheme: light;
+
+  --font-mono: 'Roboto Mono', ui-monospace, 'SF Mono', consolas, monospace;
+  --font-sans: 'Roboto', -apple-system, blinkmacsystemfont, 'Segoe UI', sans-serif;
+
+  /* Spatial motion: position, size, rotation, corners. Color and opacity keep --transition-*. */
+  --motion-spatial-fast: var(--transition-fast);
+  --motion-spatial-base: var(--transition-base);
+  --motion-spatial-slow: var(--transition-slow);
+
+  /* Leaving: Material's emphasized accelerate, which starts slow and finishes fast. */
+  --motion-exit: 150ms cubic-bezier(0.3, 0, 0.8, 0.15);
+
+  /* Select: square corners, a bar on the chosen row, and no flourishes (each 0s). */
+  --select-radius: var(--radius);
+  --select-list-radius: var(--radius);
+  --select-list-padding: var(--space-xxs);
+  --select-option-gap: 0rem;
+  --select-inset: var(--space-sm);
+  --select-highlight: var(--color-hover);
+  --select-chosen-fill: var(--color-accent-container);
+  --select-chosen-ring: transparent;
+  --select-chosen-bar: block;
+  --select-glide: 0s;
+  --select-check-pop: 0s;
+  --select-roll: 0s;
+  --select-jelly: 0s;
+  --select-unfurl: 0s;
+  --select-exit: 0s;
+  --select-exit-fade: var(--transition-fast);
+  --select-exit-clip-delay: 80ms;
+
+  /* Button shapes are defaults; projects may override them. `shape="round"` reads the round pair. */
+  --radius-button: var(--radius);
+  --radius-button-pressed: var(--radius);
+  --radius-button-round: var(--radius-pill);
+
+  /* PillGroup's own corner, so choice pills never borrow the button shape. */
+  --radius-pill-group: var(--radius);
+
+  /* Skip links keep the Standard palette in every look. */
+  --skip-link-background: var(--blue-55);
+  --skip-link-foreground: var(--gray-00);
+
+  /* The key action: at most one per view. */
+  --button-hero-block-size: var(--control-height-md);
+  --button-hero-padding-inline: var(--space-md);
+  --button-hero-font-size: var(--text-md);
+  --button-hero-radius-pressed: var(--radius-button-pressed);
+
+  /* Switch track corner and handle sizes: off, on, pressed. */
+  --switch-track-radius: var(--radius);
+  --switch-thumb-size: 1.25rem;
+  --switch-thumb-size-checked: 1.25rem;
+  --switch-thumb-size-pressed: 1.25rem;
+
+  /* The orange button: plain in standard, hand-drawn in Expressive. */
+  --brand-cta-drawing: none;
+  --brand-cta-face: var(--color-brand-cta);
+  --brand-cta-face-hover: var(--color-brand-cta-hover);
+  --brand-cta-face-active: var(--color-brand-cta-active);
+
+  /* "On" states (switch on, checked, chosen): ink in standard. Expressive keeps the same ink. */
+  --color-state: var(--color-fg-primary);
+  --color-state-fill: var(--color-fg-primary);
+  --color-state-fg: var(--color-bg-primary);
+  --color-state-edge: var(--color-state);
+
+  /* Hovering a filled "on" control lays its label color over the fill at this share (Material's
+     state layer), so the fill moves away from the page. */
+  --state-hover-layer: 16%;
+
+  /* The outline's current-heading edge: ink, as it rendered before the token existed. */
+  --color-current-indicator: var(--color-fg-primary);
+
+  /* The secondary button (`primary` variant): an inked edge on the tertiary surface. */
+  --button-secondary-face: var(--color-bg-tertiary);
+  --button-secondary-edge: var(--color-fg-primary);
+
+  /* A disabled pressed toggle: no edge in Standard, where the unpressed toggle's ink edge already
+     tells them apart. */
+  --button-pressed-disabled-edge: transparent;
+}
+
+/* Expressive mode: the scaffold sets data-expressive on <html>. Tokens not listed keep their standard value. */
+
+/* Material's web curves for the expressive spatial springs (m3.material.io, motion overview). */
+:root[data-expressive] {
+  --motion-spatial-fast: 350ms cubic-bezier(0.42, 1.67, 0.21, 0.9);
+  --motion-spatial-base: 500ms cubic-bezier(0.38, 1.21, 0.22, 1);
+  --motion-spatial-slow: 650ms cubic-bezier(0.39, 1.29, 0.35, 0.98);
+
+  /* Square buttons use a small corner so they read as rectangles. Round buttons keep the
+     pill: half the hero height clamps every shorter button to one, and a finite radius animates
+     from the first frame where 999px would not. */
+  --radius-button: 6px;
+  --radius-button-pressed: var(--radius-button);
+  --radius-button-round: calc(var(--button-hero-block-size) / 2);
+  --radius-pill-group: var(--radius-pill);
+
+  /* Material's medium button: 56dp tall, 24dp padding, one type step up. */
+  --button-hero-block-size: 3.5rem;
+  --button-hero-padding-inline: 1.5rem;
+  --button-hero-font-size: var(--text-lg);
+  --button-hero-radius-pressed: var(--radius-button);
+
+  /* Material's switch: round track, handle at 0.5, 0.75, 0.875 of the track height. */
+  --switch-track-radius: 1rem;
+  --switch-thumb-size: 1rem;
+  --switch-thumb-size-checked: 1.5rem;
+  --switch-thumb-size-pressed: 1.75rem;
+
+  /* AAA marks carry the state on the low-contrast fill; the 10% hover layer keeps them above 4.5:1. */
+  --state-hover-layer: 10%;
+
+  /* Flat Expressive's disabled toggles share one gray face, so a pressed one keeps its state edge. */
+  --button-pressed-disabled-edge: var(--color-state);
+
+  --brand-cta-drawing: block;
+  --brand-cta-face: transparent;
+  --brand-cta-face-hover: transparent;
+  --brand-cta-face-active: transparent;
+
+  /* Select: pills, an ink ring on the chosen row, a highlight that springs between rows, a
+     list that unfurls and rolls back up, and a label that rolls in on a pick. The highlight is an
+     ink tint, since --color-bg-tertiary matches the overlay in dark Expressive. The list's corner
+     is a row's half height plus the list padding. The highlight glides on Material's standard
+     fast curve at 150ms, since the bouncy 350ms spring trailed the pointer. */
+  --select-radius: var(--radius-pill);
+  --select-list-radius: calc(var(--control-height-md) / 2 + var(--select-list-padding));
+  --select-list-padding: var(--space-xs);
+  --select-option-gap: var(--space-xxs);
+  --select-inset: var(--space-md);
+  --select-highlight: color-mix(in oklch, var(--color-fg-primary) 10%, transparent);
+  --select-chosen-fill: transparent;
+  --select-chosen-ring: var(--color-state);
+  --select-chosen-bar: none;
+  --select-glide: 150ms cubic-bezier(0.27, 1.06, 0.18, 1);
+  --select-check-pop: var(--motion-spatial-base) 120ms;
+  --select-roll: var(--motion-spatial-base);
+  --select-jelly: 500ms ease-out;
+  --select-unfurl: var(--motion-spatial-base);
+  --select-exit: 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  --select-exit-fade: 240ms cubic-bezier(0.4, 0, 1, 1);
+  --select-exit-clip-delay: 0s;
+}
+
+/* Flat Expressive: the secondary button is a tonal pill with no edge. An ink tint reads on the
+   page and on tinted cards alike. Tactile keeps the edge, since the edge is also its lip. */
+:root[data-expressive]:not([data-tactile]) {
+  --button-secondary-face: color-mix(in oklch, var(--color-fg-primary) 10%, transparent);
+  --button-secondary-edge: transparent;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --skip-link-background: var(--blue-30);
+  --skip-link-foreground: var(--gray-80);
+}
+
+/* BEGIN GENERATED TOKENS by projects/kestrel-design-space/scripts/palette/kestrel-palette-check.mjs. Do not edit by hand. */
+/* Standard light */
+:root,
+:root[data-theme='light'] {
+  --color-bg-primary: var(--gray-00);
+  --color-bg-secondary: var(--gray-05);
+  --color-bg-tertiary: var(--gray-10);
+  --color-bg-quaternary: var(--gray-15);
+  --color-hover: var(--gray-14);
+  --color-code-surface: var(--gray-10);
+  --color-border-primary: var(--gray-40);
+  --color-border-secondary: var(--gray-20);
+  --color-fg-primary: var(--gray-70);
+  --color-fg-secondary: var(--gray-60);
+  --color-fg-tertiary: var(--gray-55);
+  --color-fg-disabled: var(--gray-53);
+  --color-accent: var(--emerald-button);
+  --color-accent-fg: var(--gray-00);
+  --color-link: var(--gray-70);
+  --color-success: var(--green-55);
+  --color-danger: var(--red-55);
+  --color-focus: var(--blue-focus-on-light);
+  --color-accent-text: var(--emerald-55);
+  --color-accent-hover: var(--emerald-button-hover);
+  --color-accent-active: var(--emerald-button-active);
+  --color-accent-container: var(--gray-15);
+  --color-success-bg: var(--green-10);
+  --color-warning: var(--yellow-55);
+  --color-warning-bg: var(--yellow-10);
+  --color-danger-bg: var(--red-10);
+  --color-info: var(--blue-55);
+  --color-info-bg: var(--blue-10);
+  --color-brand-from: var(--emerald-logo);
+  --color-brand-to: var(--tangerine-mark);
+  --color-selected-edge: var(--tangerine-mark);
+  --color-highlight-mark: var(--tangerine-mark);
+  --color-highlight-bg: var(--tangerine-20);
+  --color-current-item-bg: var(--emerald-15);
+  --color-progress-from: var(--emerald-logo);
+  --color-progress: var(--emerald-logo);
+  --color-brand-cta: var(--tangerine-button);
+  --color-brand-cta-fg: var(--emerald-label);
+  --color-brand-cta-hover: var(--tangerine-button-hover);
+  --color-brand-cta-active: var(--tangerine-button-active);
+  --color-brand-cta-shade: var(--tangerine-button-shade);
+  --color-current-item-accent: var(--emerald-button);
+  --color-current-item-accent-fg: var(--gray-00);
+  --color-current-item-accent-hover: var(--emerald-button-hover);
+  --color-current-item-accent-active: var(--emerald-button-active);
+  --color-cat-1: var(--cat1-light);
+  --color-cat-1-bg: var(--cat1-10);
+  --color-cat-2: var(--cat2-light);
+  --color-cat-2-bg: var(--cat2-10);
+  --color-cat-3: var(--cat3-light);
+  --color-cat-3-bg: var(--cat3-10);
+  --color-cat-4: var(--cat4-light);
+  --color-cat-4-bg: var(--cat4-10);
+  --color-cat-5: var(--cat5-light);
+  --color-cat-5-bg: var(--cat5-10);
+  --color-cat-6: var(--cat6-light);
+  --color-cat-6-bg: var(--cat6-10);
+  --color-bg-nav: var(--color-bg-primary);
+  --surface-overlay: var(--color-bg-primary);
+}
+
+/* Standard dark */
+:root[data-theme='dark'] {
+  --color-bg-primary: var(--gray-80);
+  --color-bg-secondary: var(--gray-85);
+  --color-bg-tertiary: var(--gray-75);
+  --color-bg-quaternary: var(--gray-70);
+  --color-hover: var(--gray-71);
+  --color-code-surface: var(--gray-75);
+  --color-border-primary: var(--gray-45);
+  --color-border-secondary: var(--gray-60);
+  --color-fg-primary: var(--gray-15);
+  --color-fg-secondary: var(--gray-25);
+  --color-fg-tertiary: var(--gray-35);
+  --color-fg-disabled: var(--gray-37);
+  --color-accent: var(--emerald-logo);
+  --color-accent-fg: var(--gray-00);
+  --color-link: var(--gray-15);
+  --color-success: var(--green-35);
+  --color-danger: var(--red-35);
+  --color-focus: var(--blue-focus-on-dark);
+  --color-accent-text: var(--emerald-35);
+  --color-accent-hover: var(--emerald-logo-hover);
+  --color-accent-active: var(--emerald-logo-active);
+  --color-accent-container: var(--gray-70);
+  --color-success-bg: var(--green-75);
+  --color-warning: var(--yellow-30);
+  --color-warning-bg: var(--yellow-75);
+  --color-danger-bg: var(--red-75);
+  --color-info: var(--blue-30);
+  --color-info-bg: var(--blue-75);
+  --color-brand-from: var(--emerald-mark);
+  --color-brand-to: var(--tangerine-logo);
+  --color-selected-edge: var(--tangerine-logo);
+  --color-highlight-mark: var(--tangerine-logo);
+  --color-highlight-bg: var(--tangerine-70);
+  --color-current-item-bg: var(--emerald-75);
+  --color-progress-from: var(--emerald-mark);
+  --color-progress: var(--emerald-mark);
+  --color-brand-cta: var(--tangerine-button);
+  --color-brand-cta-fg: var(--emerald-label);
+  --color-brand-cta-hover: var(--tangerine-button-hover);
+  --color-brand-cta-active: var(--tangerine-button-active);
+  --color-brand-cta-shade: var(--tangerine-button-shade);
+  --color-current-item-accent: var(--emerald-on-card);
+  --color-current-item-accent-fg: var(--emerald-label);
+  --color-current-item-accent-hover: var(--emerald-on-card-hover);
+  --color-current-item-accent-active: var(--emerald-on-card-active);
+  --color-cat-1: var(--cat1-dark);
+  --color-cat-1-bg: var(--cat1-75);
+  --color-cat-2: var(--cat2-dark);
+  --color-cat-2-bg: var(--cat2-75);
+  --color-cat-3: var(--cat3-dark);
+  --color-cat-3-bg: var(--cat3-75);
+  --color-cat-4: var(--cat4-dark);
+  --color-cat-4-bg: var(--cat4-75);
+  --color-cat-5: var(--cat5-dark);
+  --color-cat-5-bg: var(--cat5-75);
+  --color-cat-6: var(--cat6-dark);
+  --color-cat-6-bg: var(--cat6-75);
+  --color-bg-nav: var(--gray-90);
+  --surface-overlay: var(--color-bg-tertiary);
+}
+
+/* Expressive light */
+:root[data-expressive]:not([data-theme='dark']) {
+  --color-bg-primary: var(--sage-02);
+  --color-bg-secondary: var(--sage-07);
+  --color-bg-tertiary: var(--sage-12);
+  --color-bg-quaternary: var(--sage-17);
+  --color-hover: var(--sage-16);
+  --color-code-surface: var(--sage-12);
+  --color-border-primary: var(--sage-42);
+  --color-border-secondary: var(--sage-22);
+  --color-fg-primary: var(--sage-72);
+  --color-fg-secondary: var(--sage-62);
+  --color-fg-tertiary: var(--sage-57);
+  --color-fg-disabled: var(--sage-55);
+  --color-accent-fg: var(--sage-02);
+  --color-link: var(--sage-72);
+  --color-success-bg: var(--green-12);
+  --color-warning-bg: var(--yellow-12);
+  --color-current-item-accent-fg: var(--sage-02);
+}
+
+/* Expressive dark */
+:root[data-theme='dark'][data-expressive] {
+  --color-bg-primary: var(--sage-82);
+  --color-bg-secondary: var(--sage-87);
+  --color-bg-tertiary: var(--sage-77);
+  --color-bg-quaternary: var(--sage-72);
+  --color-hover: var(--sage-73);
+  --color-code-surface: var(--sage-77);
+  --color-border-primary: var(--sage-47);
+  --color-border-secondary: var(--sage-62);
+  --color-fg-primary: var(--sage-17);
+  --color-fg-secondary: var(--sage-27);
+  --color-fg-tertiary: var(--sage-37);
+  --color-fg-disabled: var(--sage-39);
+  --color-accent-fg: var(--sage-02);
+  --color-link: var(--sage-17);
+  --color-accent-container: var(--sage-72);
+  --color-success-bg: var(--green-77);
+  --color-warning-bg: var(--yellow-77);
+  --color-danger-bg: var(--red-77);
+  --color-info-bg: var(--blue-77);
+}
+
+/* Hover on a control inside an overlay surface (drawer, modal). --color-hover is 1.1:1 against the dark overlay; 14% foreground reaches about 1.5:1. */
+:root {
+  --color-hover-overlay: color-mix(in oklab, var(--color-fg-primary) 14%, var(--surface-overlay));
+}
+
+/* Flat depth, shared */
+:root {
+  --depth-lip: 0rem;
+  --depth-lip-small: 0rem;
+  --shadow-card: none;
+  --shadow-card-hover: none;
+  --card-lift: 0rem;
+  --inset-well: inset 0 0 0 0 transparent;
+  --shadow-menu:
+    0 0.0625rem 0.125rem 0 rgb(0 0 0 / 0.3), 0 0.125rem 0.375rem 0.125rem rgb(0 0 0 / 0.15);
+  --shadow-dialog:
+    0 0.0625rem 0.1875rem 0 rgb(0 0 0 / 0.3), 0 0.25rem 0.5rem 0.1875rem rgb(0 0 0 / 0.15);
+}
+
+/* Tactile depth, shared */
+:root[data-expressive][data-tactile] {
+  --depth-lip: 0.25rem;
+  --depth-lip-small: 0.125rem;
+  --card-lift: -0.125rem;
+}
+
+/* Tactile depth, light */
+:root[data-expressive][data-tactile]:not([data-theme='dark']) {
+  --shadow-card: 0 0.125rem 0.375rem 0 rgb(0 0 0 / 0.08), 0 0.375rem 1rem 0 rgb(0 0 0 / 0.08);
+  --shadow-card-hover: 0 0.25rem 0.625rem 0 rgb(0 0 0 / 0.1), 0 0.75rem 1.5rem 0 rgb(0 0 0 / 0.1);
+  --inset-well: inset 0 0.09375rem 0.125rem rgb(0 0 0 / 0.1);
+}
+
+/* Tactile depth, dark */
+:root[data-theme='dark'][data-expressive][data-tactile] {
+  --shadow-card: 0 0.125rem 0.375rem 0 rgb(0 0 0 / 0.5), 0 0.375rem 1rem 0 rgb(0 0 0 / 0.5);
+  --shadow-card-hover: 0 0.25rem 0.625rem 0 rgb(0 0 0 / 0.6), 0 0.75rem 1.5rem 0 rgb(0 0 0 / 0.6);
+  --inset-well:
+    inset 0 0.1875rem 0.25rem rgb(0 0 0 / 0.3), inset 0 -0.0625rem 0 rgb(255 255 255 / 0.08);
+}
+/* END GENERATED TOKENS */
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: 1.5;
+  background-color: var(--color-bg-secondary);
+  color: var(--color-fg-primary);
+}

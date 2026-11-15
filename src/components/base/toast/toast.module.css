@@ -1,0 +1,257 @@
+.region {
+  position: fixed;
+  inset-block-end: var(--space-md);
+  inset-inline: var(--space-md);
+  z-index: 200;
+  pointer-events: none;
+}
+
+/* Inside a container the region moves with it; the container must be positioned. */
+.region[data-scope='container'] {
+  position: absolute;
+  z-index: 1;
+}
+
+.list {
+  --toast-gap: var(--space-sm);
+
+  display: grid;
+  justify-items: end;
+  margin: 0;
+  margin-block-end: calc(var(--toast-gap) * -1);
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * The item owns the space a toast takes, so a leaving toast collapses it and the others slide into
+ * place. The stack gap lives in the clip's end padding for the same reason, and the list's negative
+ * end margin cancels the last one.
+ */
+.item {
+  display: grid;
+  grid-template-rows: 1fr;
+  inline-size: 100%;
+  max-inline-size: 24rem;
+  animation:
+    toast-grow var(--motion-spatial-fast),
+    toast-fade var(--transition-base);
+}
+
+.clip {
+  min-block-size: 0;
+  padding-block-end: var(--toast-gap);
+
+  /* The margin keeps the toast's shadow visible. */
+  overflow: clip;
+  overflow-clip-margin: 2rem;
+}
+
+.region[data-position^='top'] {
+  inset-block: var(--space-md) auto;
+}
+
+.region[data-position$='start'] .list {
+  justify-items: start;
+}
+
+.region[data-position$='center'] .list {
+  justify-items: center;
+}
+
+.toast {
+  --toast-rise-from: 0.5rem;
+  --toast-fill: var(--color-bg-quaternary);
+  --toast-ink: var(--color-fg-primary);
+  --dismiss-size: var(--control-height-sm);
+  --dismiss-glyph-size: var(--button-icon-size-sm);
+  --dismiss-glyph-inset: calc((var(--dismiss-size) - var(--dismiss-glyph-size)) / 2);
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  inline-size: 100%;
+  padding-block: var(--space-sm);
+  padding-inline: var(--space-md) calc(var(--space-md) - var(--dismiss-glyph-inset));
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius);
+  background-color: var(--toast-fill);
+  box-shadow: var(--shadow-menu);
+  color: var(--toast-ink);
+  pointer-events: auto;
+  animation: toast-rise var(--motion-spatial-base);
+}
+
+/* A toast at the top edge enters from above, a toast at the bottom from below. */
+.region[data-position^='top'] .toast {
+  --toast-rise-from: -0.5rem;
+}
+
+.icon {
+  flex-shrink: 0;
+  inline-size: 1rem;
+  block-size: 1rem;
+
+  /* Centers the icon on the message's first line (its padding plus half the 1.25rem line). */
+  margin-block-start: calc(var(--space-xxs) + 0.125rem);
+}
+
+/*
+ * Every toast is filled. A neutral toast takes a raised surface of the theme (light in the light
+ * theme, dark in the dark theme) with the normal text color. A toned toast takes its status color
+ * and the page color as ink. Inside, the foreground tokens are remapped to the ink, so the ghost
+ * action and dismiss Buttons, their hover and press faces, and the focus ring read on the fill. The
+ * toast itself keeps the real tokens, so its fill can read them.
+ */
+.success,
+.danger,
+.info,
+.warning {
+  --toast-ink: var(--color-bg-primary);
+
+  border-color: var(--toast-fill);
+}
+
+.success {
+  --toast-fill: var(--color-success);
+}
+
+.danger {
+  --toast-fill: var(--color-danger);
+}
+
+.info {
+  --toast-fill: var(--color-info);
+}
+
+.warning {
+  --toast-fill: var(--color-warning);
+}
+
+.toast > * {
+  --color-fg-primary: var(--toast-ink);
+  --color-focus: var(--toast-ink);
+  --color-hover: color-mix(in srgb, var(--toast-ink) 10%, var(--toast-fill));
+  --color-bg-quaternary: color-mix(in srgb, var(--toast-ink) 18%, var(--toast-fill));
+}
+
+/* The icon's cut-out marks take the fill color, so the glyph reads as ink with a hole. */
+.toast .icon {
+  --surface-overlay: var(--toast-fill);
+  --color-bg-primary: var(--toast-fill);
+}
+
+.body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xxs) var(--space-md);
+  min-inline-size: 0;
+}
+
+.message {
+  flex: 1 1 auto;
+  margin: 0;
+  padding-block: var(--space-xxs);
+  font-size: var(--text-xs);
+  line-height: 1.25rem;
+}
+
+/*
+ * The action is an inverted pill so it reads as a control beside the message: the ink fills it and
+ * its label takes the toast's own color (the status color on a toned toast). It stays borderless.
+ */
+.toast .action {
+  --face: var(--toast-ink);
+
+  flex: none;
+  color: var(--toast-fill);
+  white-space: nowrap;
+}
+
+.dismiss {
+  flex: none;
+  align-self: flex-start;
+
+  /* Centers the button on the message's first line. */
+  margin-block: calc((1.25rem + var(--space-xxs) * 2 - var(--dismiss-size)) / 2);
+}
+
+/*
+ * Stacked (`data-stacked`, set when the action wraps below the message), as Material's two-line
+ * snackbar: the action takes its own row at the inline end, under the dismiss button, and its end
+ * edge lines up with the X glyph. The offset moves it without changing layout, so the wrap never
+ * flips. The glyph sits as far from the end edge as the text does from the start (every toast).
+ * The top padding is smaller than the bottom: the first line already has leading above its letters,
+ * so the top of the text sits as far from the edge as the action pill does at the bottom.
+ */
+.toast[data-stacked] {
+  padding-block: calc(var(--space-md) - var(--space-sm)) var(--space-md);
+}
+
+.toast[data-stacked] .body {
+  row-gap: var(--space-sm);
+}
+
+.toast[data-stacked] .action {
+  position: relative;
+  inset-inline-start: calc(var(--dismiss-size) + var(--space-sm) - var(--dismiss-glyph-inset));
+  margin-inline-start: auto;
+}
+
+.toast .action:hover:not([aria-disabled='true']) {
+  --face: color-mix(in srgb, var(--toast-fill) 14%, var(--toast-ink));
+}
+
+.toast .action:active:not([aria-disabled='true']) {
+  --face: color-mix(in srgb, var(--toast-fill) 26%, var(--toast-ink));
+}
+
+/*
+ * Exits are shorter than the entrance. Rows and opacity share one duration, and the toast unmounts
+ * on the opacity transition ending.
+ */
+.leaving {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  animation: none;
+  transition:
+    grid-template-rows var(--motion-exit),
+    opacity var(--motion-exit);
+}
+
+@keyframes toast-grow {
+  from {
+    grid-template-rows: 0fr;
+  }
+}
+
+@keyframes toast-rise {
+  from {
+    translate: 0 var(--toast-rise-from);
+  }
+}
+
+@keyframes toast-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The space snaps and nothing translates; the toast cross-fades. */
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    animation: toast-fade var(--transition-fast);
+  }
+
+  .toast {
+    animation: none;
+  }
+
+  /* The space holds while the content fades and goes when it unmounts, so nothing vanishes first. */
+  .leaving {
+    grid-template-rows: 1fr;
+    transition: opacity var(--transition-fast);
+  }
+}

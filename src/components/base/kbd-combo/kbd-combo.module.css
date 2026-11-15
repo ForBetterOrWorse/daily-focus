@@ -1,0 +1,60 @@
+.combo {
+  display: none;
+  align-items: center;
+  gap: var(--space-xxs);
+}
+
+@media (min-width: 768px) and (hover: hover) {
+  .combo {
+    display: inline-flex;
+  }
+}
+
+.combo kbd {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
+  min-inline-size: 1.6rem;
+  min-block-size: 1.6rem;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.combo > span {
+  display: flex;
+  align-items: center;
+}
+
+.combo kbd.kbd-square {
+  flex-basis: 1.6rem;
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  padding: 0;
+}
+
+.combo.minimal kbd {
+  box-shadow: none;
+  min-inline-size: 1.25rem;
+  min-block-size: 1.25rem;
+  padding-block: 0;
+  padding-inline: var(--space-xxs);
+  font-size: var(--text-2xs);
+  line-height: 1;
+}
+
+.combo.minimal kbd.kbd-square {
+  flex-basis: 1.25rem;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  padding: 0;
+}
+
+.combo kbd.kbd-symbol {
+  font-family: -apple-system, system-ui, sans-serif;
+}
+
+.plus {
+  color: var(--color-fg-primary);
+  margin-inline-end: var(--space-xxs);
+}

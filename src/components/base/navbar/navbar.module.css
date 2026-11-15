@@ -1,0 +1,133 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  block-size: var(--navbar-height);
+  padding-inline: var(--space-xs);
+  background-color: var(--color-bg-nav);
+}
+
+.home {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-block-size: var(--control-height-md);
+  padding-inline: var(--space-xxs);
+  border-radius: var(--radius);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-fg-primary);
+  transition: background-color var(--transition-fast);
+}
+
+.mark {
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  flex: none;
+}
+
+.navbar .home:hover {
+  background-color: var(--color-hover);
+  color: var(--color-fg-primary);
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xxs);
+  margin-inline: var(--space-xs);
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--control-height-md);
+  padding-inline: var(--space-sm);
+  border-radius: var(--radius);
+  color: var(--color-link);
+  font-size: var(--text-xs);
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
+}
+
+.nav-link:hover {
+  background-color: var(--color-hover);
+}
+
+.nav-link:active {
+  background-color: var(--color-bg-quaternary);
+}
+
+.nav-link[aria-current='page'] {
+  background-color: var(--color-accent-container);
+  font-weight: 400;
+}
+
+/* Expressive and Tactile: a wavy orange underline replaces the gray fill. Orange is decoration here,
+   so hover draws a shorter, softer wave and the current link holds the full one. */
+:root[data-expressive] .nav-link {
+  --wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 8'%3E%3Cpath d='M0 4 Q6 0 12 4 T24 4' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+
+  position: relative;
+}
+
+:root[data-expressive] .nav-link::after {
+  content: '';
+  position: absolute;
+  inset-inline: var(--space-sm);
+  inset-block-end: -0.125rem;
+  block-size: 0.5rem;
+  background-color: color-mix(in oklab, var(--color-selected-edge) 55%, transparent);
+  mask-image: var(--wave);
+  mask-repeat: repeat-x;
+  mask-size: 1rem 0.5rem;
+  clip-path: inset(0 50%);
+  transition:
+    clip-path var(--motion-spatial-fast),
+    background-color var(--transition-fast);
+}
+
+:root[data-expressive] .nav-link:hover,
+:root[data-expressive] .nav-link:active,
+:root[data-expressive] .nav-link[aria-current='page'] {
+  background-color: transparent;
+}
+
+:root[data-expressive] .nav-link:hover::after {
+  clip-path: inset(0 25%);
+}
+
+:root[data-expressive] .nav-link[aria-current='page'] {
+  font-weight: 500;
+}
+
+:root[data-expressive] .nav-link[aria-current='page']::after {
+  background-color: var(--color-selected-edge);
+  clip-path: inset(0);
+}
+
+.action-keyboard-only {
+  display: none;
+}
+
+@media (min-width: 600px) {
+  .navbar {
+    padding-inline: var(--space-md);
+  }
+
+  .home,
+  .nav-link {
+    padding-inline: var(--space-sm);
+    font-size: var(--text-md);
+  }
+
+  .navigation {
+    margin-inline: var(--space-md);
+  }
+}
+
+@media (hover: hover) {
+  .action-keyboard-only {
+    display: inline-flex;
+  }
+}

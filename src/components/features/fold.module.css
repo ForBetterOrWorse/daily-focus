@@ -1,0 +1,63 @@
+.fold {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-block-start: calc(-1 * var(--space-lg));
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--motion-spatial-base),
+    margin-block-start var(--motion-spatial-base),
+    visibility 0s linear 500ms;
+}
+
+.fold[data-open] {
+  grid-template-rows: 1fr;
+  margin-block-start: 0;
+  visibility: visible;
+  transition:
+    grid-template-rows var(--motion-spatial-base),
+    margin-block-start var(--motion-spatial-base);
+}
+
+.inner {
+  min-block-size: 0;
+  overflow: hidden;
+  padding-block: 0;
+  padding-inline: var(--space-xxs);
+  margin-inline: calc(-1 * var(--space-xxs));
+  opacity: 0;
+  translate: 0 -0.75rem;
+  transition:
+    opacity var(--transition-base),
+    translate var(--motion-spatial-base),
+    padding-block var(--motion-spatial-base);
+}
+
+.fold[data-open] .inner {
+  padding-block: var(--space-xxs);
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fold,
+  .fold[data-open] {
+    transition:
+      grid-template-rows var(--transition-fast),
+      margin-block-start var(--transition-fast),
+      opacity var(--transition-fast),
+      visibility var(--transition-fast);
+  }
+
+  .fold {
+    opacity: 0;
+  }
+
+  .fold[data-open] {
+    opacity: 1;
+  }
+
+  .inner,
+  .fold[data-open] .inner {
+    transition: opacity var(--transition-fast);
+  }
+}
