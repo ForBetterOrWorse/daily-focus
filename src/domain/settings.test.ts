@@ -12,7 +12,6 @@ const habit: HabitItem = {
   id: 'stretch',
   name: 'Stretch',
   kind: 'habit',
-  groupId: null,
   completion: 'check',
   goals: [],
   days: [0, 1, 2, 3, 4, 5, 6],

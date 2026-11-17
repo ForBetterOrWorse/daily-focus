@@ -38,7 +38,6 @@ function renderStats() {
 const habit: ItemInput = {
   kind: 'habit',
   name: 'Read',
-  groupId: null,
   completion: 'time',
   target: 30,
   timerStyle: 'free',
@@ -65,13 +64,13 @@ describe('WeekStats', () => {
     renderStats();
 
     expect(screen.getByText('This week')).toBeVisible();
-    expect(screen.getAllByText('20 min')).toHaveLength(3);
+    expect(screen.getAllByText('20 min')).toHaveLength(2);
 
     await user.click(screen.getByRole('button', { name: 'Previous week' }));
     expect(
       within(screen.getByRole('group', { name: 'Week' })).getByText('Oct 19 to Oct 25')
     ).toBeVisible();
-    expect(screen.getAllByText('45 min')).toHaveLength(3);
+    expect(screen.getAllByText('45 min')).toHaveLength(2);
 
     await user.click(screen.getByRole('button', { name: 'Next week' }));
     expect(screen.getByText('This week')).toBeVisible();
@@ -112,7 +111,7 @@ describe('WeekStats', () => {
     expect(screen.getByText('This week')).toBeVisible();
   });
 
-  it('should show an empty message in each panel for a week with no time', async () => {
+  it('should show an empty message for a week with no time', async () => {
     const user = userEvent.setup();
     seed([habit], ([id]) => [session('s1', id, '2026-10-21', 45)]);
     renderStats();
@@ -123,23 +122,16 @@ describe('WeekStats', () => {
     expect(
       within(screen.getByRole('group', { name: 'Week' })).getByText('Oct 12 to Oct 18')
     ).toBeVisible();
-    expect(screen.queryByRole('table', { name: 'By group' })).not.toBeInTheDocument();
     expect(screen.queryByRole('table', { name: 'By task and habit' })).not.toBeInTheDocument();
-    expect(screen.getAllByText('No time tracked in this range.')).toHaveLength(2);
+    expect(screen.getByText('No time tracked in this range.')).toBeVisible();
   });
 
-  it('should render both tables with header cells and labeled rows', () => {
+  it('should render a table with header cells and item rows', () => {
     seed([habit], ([id]) => [session('s1', id, '2026-10-28', 20)]);
     renderStats();
 
-    const byGroup = screen.getByRole('table', { name: 'By group' });
-    expect(within(byGroup).getAllByRole('columnheader', { hidden: true })).toHaveLength(2);
-    expect(within(byGroup).getByRole('rowheader', { name: 'No group' })).toBeVisible();
-
     const byItem = screen.getByRole('table', { name: 'By task and habit' });
     expect(within(byItem).getAllByRole('columnheader', { hidden: true })).toHaveLength(2);
-    expect(within(byItem).getByRole('rowheader', { name: /Read/ })).toHaveTextContent(
-      'Habit · No group'
-    );
+    expect(within(byItem).getByRole('rowheader', { name: /Read/ })).toHaveTextContent('Habit');
   });
 });

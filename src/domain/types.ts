@@ -5,7 +5,6 @@ export type Phase = 'focus' | 'break' | 'long-break';
 
 export interface AppData {
   version: 1;
-  groups: Group[];
   items: Item[];
   order: { habits: string[]; tasks: string[] };
   sessions: Session[];
@@ -19,16 +18,9 @@ export interface AppData {
   tombstones: Record<string, number>;
 }
 
-export interface Group {
-  id: string;
-  name: string;
-  updatedAt: number;
-}
-
 export interface ItemBase {
   id: string;
   name: string;
-  groupId: string | null;
   completion: Completion;
   goals: { from: DayKey; target: number }[];
   timerStyle?: TimerStyle;
@@ -50,7 +42,6 @@ export interface QuickItem extends ItemBase {
   name: string;
   completion: 'time';
   goals: [];
-  groupId: null;
   timerStyle: TimerStyle;
   number: number;
   day: DayKey;

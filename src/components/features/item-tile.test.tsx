@@ -8,7 +8,6 @@ const readItem: Item = {
   id: 'read',
   kind: 'task',
   name: 'Read',
-  groupId: null,
   completion: 'time',
   timerStyle: 'free',
   goals: [],

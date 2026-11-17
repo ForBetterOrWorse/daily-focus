@@ -100,7 +100,7 @@
   max-inline-size: 100%;
 }
 
-/* The group grows from zero height while its tiles slide down from the top edge, so the section
+/* The list grows from zero height while its tiles slide down from the top edge, so the section
    below is pushed down with them. Overflow clips only while it runs. */
 .reveal[data-revealing='true'] {
   overflow: hidden;
@@ -125,30 +125,8 @@
   }
 }
 
-.groups {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: var(--space-sm) var(--space-lg);
-}
-
-.group {
-  min-block-size: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xxs);
-}
-
-.group-title {
-  margin: 0;
-  padding-block-start: var(--space-xs);
-  padding-inline: var(--space-xxs);
-  color: var(--color-fg-tertiary);
-  font-size: var(--text-2xs);
-  font-weight: 500;
-}
-
 .items {
+  min-block-size: 0;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
@@ -161,7 +139,7 @@
   flex: 0 0 6.75rem;
 }
 
-.reveal[data-revealing='true'] .group {
+.reveal[data-revealing='true'] .items {
   animation: reveal-slide var(--reveal-motion);
 }
 
@@ -170,7 +148,7 @@
     animation: reveal-fade var(--transition-fast);
   }
 
-  .reveal[data-revealing='true'] .group {
+  .reveal[data-revealing='true'] .items {
     animation: none;
   }
 

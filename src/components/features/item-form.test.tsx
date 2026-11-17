@@ -9,24 +9,11 @@ import { ItemForm } from './item-form';
 function renderForm(kind: 'habit' | 'task' = 'task') {
   const onSave = vi.fn<(item: ItemInput, today?: number) => void>();
   const onCancel = vi.fn();
-  render(<ItemForm kind={kind} groups={[]} onSave={onSave} onCancel={onCancel} />);
+  render(<ItemForm kind={kind} onSave={onSave} onCancel={onCancel} />);
   return { onSave, onCancel };
 }
 
 describe('ItemForm', () => {
-  it('should default the group to No group and list it first', async () => {
-    const user = userEvent.setup();
-    const groups = [{ id: 'work', name: 'Work', updatedAt: 0 }];
-    render(<ItemForm kind="task" groups={groups} onSave={vi.fn()} onCancel={vi.fn()} />);
-
-    const group = screen.getByRole('combobox', { name: 'Group' });
-    expect(group).toHaveTextContent('No group');
-
-    await user.click(group);
-    const options = screen.getAllByRole('option');
-    expect(options.map((option) => option.textContent)).toEqual(['No group', 'Work']);
-  });
-
   it('should add a check task when the name is submitted with Enter', async () => {
     const user = userEvent.setup();
     const { onSave } = renderForm();
@@ -39,7 +26,7 @@ describe('ItemForm', () => {
     await user.keyboard('{Enter}');
 
     expect(onSave).toHaveBeenCalledWith(
-      { name: 'Write report', groupId: null, kind: 'task', completion: 'check' },
+      { name: 'Write report', kind: 'task', completion: 'check' },
       undefined
     );
   });
@@ -142,7 +129,7 @@ describe('ItemForm', () => {
       emptyData(0),
       {
         type: 'addItem',
-        item: { name: 'Water', groupId: null, kind: 'task', completion: 'count', target: 8 },
+        item: { name: 'Water', kind: 'task', completion: 'count', target: 8 },
       },
       0
     ).items[0];
@@ -150,7 +137,6 @@ describe('ItemForm', () => {
     render(
       <ItemForm
         kind="task"
-        groups={[]}
         item={countItem}
         today={3}
         onSave={onSave}

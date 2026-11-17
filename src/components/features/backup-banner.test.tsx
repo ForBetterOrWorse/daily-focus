@@ -24,7 +24,7 @@ function setup({
   if (withItem) {
     store.dispatch({
       type: 'addItem',
-      item: { kind: 'task', name: 'Read', groupId: null, completion: 'check' },
+      item: { kind: 'task', name: 'Read', completion: 'check' },
     });
   }
   const data = store.getState().data;

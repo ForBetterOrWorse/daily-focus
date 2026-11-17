@@ -5,7 +5,6 @@ import type {
   Completion,
   DayKey,
   DayMark,
-  Group,
   HabitItem,
   Item,
   ItemClock,
@@ -18,14 +17,6 @@ import type {
   TaskItem,
   TimerStyle,
 } from './types';
-
-const DEFAULT_GROUPS = [
-  { id: '00000000-0000-4000-8000-000000000001', name: 'Work' },
-  { id: '00000000-0000-4000-8000-000000000002', name: 'Health' },
-  { id: '00000000-0000-4000-8000-000000000003', name: 'Learning' },
-  { id: '00000000-0000-4000-8000-000000000004', name: 'Chores' },
-  { id: '00000000-0000-4000-8000-000000000005', name: 'Hobby' },
-] as const;
 
 type DataObject = Record<string, unknown>;
 
@@ -135,15 +126,6 @@ function nullableNumberAt(value: unknown, path: string): number | null {
   return value === null ? null : numberAt(value, path);
 }
 
-function parseGroup(value: unknown, path: string): Group {
-  const group = objectAt(value, path);
-  return {
-    id: stringAt(group.id, `${path}.id`),
-    name: stringAt(group.name, `${path}.name`),
-    updatedAt: numberAt(group.updatedAt, `${path}.updatedAt`),
-  };
-}
-
 function parseGoal(value: unknown, path: string, completion: Completion): Item['goals'][number] {
   const goal = objectAt(value, path);
   const target = numberAt(goal.target, `${path}.target`);
@@ -208,7 +190,6 @@ function parseItem(value: unknown, path: string): Item {
   const base = {
     id: stringAt(item.id, `${path}.id`),
     name: nameAt(item.name, `${path}.name`, kind === 'quick'),
-    groupId: item.groupId === null ? null : stringAt(item.groupId, `${path}.groupId`),
     completion,
     goals,
     ...(timerStyle === undefined ? {} : { timerStyle }),
@@ -217,9 +198,6 @@ function parseItem(value: unknown, path: string): Item {
   };
 
   if (kind === 'quick') {
-    if (item.groupId !== null) {
-      return invalid(`${path}.groupId`, 'quick items must not belong to a group');
-    }
     if (goals.length !== 0) {
       return invalid(`${path}.goals`, 'quick items must have no goals');
     }
@@ -237,7 +215,6 @@ function parseItem(value: unknown, path: string): Item {
       kind,
       completion: 'time',
       goals: [],
-      groupId: null,
       timerStyle,
       number,
       day: dayKeyAt(item.day, `${path}.day`),
@@ -391,7 +368,6 @@ function clockRecordAt(value: unknown, path: string): Record<string, ItemClock> 
 export function emptyData(now: number): AppData {
   return {
     version: 1,
-    groups: DEFAULT_GROUPS.map(({ id, name }) => ({ id, name, updatedAt: now })),
     items: [],
     order: { habits: [], tasks: [] },
     sessions: [],
@@ -439,7 +415,6 @@ export function parseData(json: unknown): AppData {
 
   return {
     version: 1,
-    groups: arrayAt(data.groups, 'data.groups', parseGroup),
     items,
     order: {
       habits: stringArrayAt(order.habits, 'data.order.habits'),

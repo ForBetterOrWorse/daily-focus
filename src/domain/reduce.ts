@@ -13,7 +13,6 @@ import {
   type ItemSection,
 } from './items';
 import { mergeData, replaceData } from './backup';
-import { addGroup, removeGroup, renameGroup } from './groups';
 import { setColumnsOpen } from './layout';
 import { updateSettings, type SettingsPatch } from './settings';
 import { newQuickSession, renameQuick, saveQuickAsTask, setQuickStyle } from './quick-sessions';
@@ -36,9 +35,6 @@ export type Action =
   | { type: 'setQuickStyle'; itemId: string; style: TimerStyle }
   | { type: 'saveQuickAsTask'; itemId: string }
   | { type: 'setColumnsOpen'; open: boolean }
-  | { type: 'addGroup'; name: string }
-  | { type: 'renameGroup'; groupId: string; name: string }
-  | { type: 'removeGroup'; groupId: string }
   | { type: 'updateSettings'; patch: SettingsPatch }
   | { type: 'useSkip'; day: DayKey }
   | { type: 'markExported' }
@@ -80,12 +76,6 @@ function apply(data: AppData, action: Action, now: number): AppData {
       return setQuickStyle(data, action.itemId, action.style, now);
     case 'saveQuickAsTask':
       return saveQuickAsTask(data, action.itemId, now);
-    case 'addGroup':
-      return addGroup(data, action.name, now);
-    case 'renameGroup':
-      return renameGroup(data, action.groupId, action.name, now);
-    case 'removeGroup':
-      return removeGroup(data, action.groupId, now);
     case 'updateSettings':
       return updateSettings(data, action.patch, now);
     case 'useSkip':

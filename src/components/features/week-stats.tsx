@@ -4,7 +4,7 @@ import { Link } from '@/components/base/link/link';
 import { ArrowLeftIcon, ArrowRightIcon } from '@/components/base/icon';
 import { hasTracked } from '@/domain/activity';
 import { addDays, dayKeyOf, weekRange } from '@/domain/days';
-import { NO_GROUP_NAME, weekStats } from '@/domain/stats';
+import { weekStats } from '@/domain/stats';
 import type { DayKey } from '@/domain/types';
 import { useAppData, useNow } from '@/store/use-app-data';
 import { formatDuration } from '@/utils/format-duration';
@@ -156,23 +156,13 @@ export function WeekStats() {
 
           <div className={styles.panels}>
             <BarTable
-              title="By group"
-              column="Group"
-              rows={stats.byGroup.map((group) => ({
-                key: group.groupId ?? NO_GROUP_NAME,
-                label: group.name,
-                ms: group.ms,
-              }))}
-            />
-            <BarTable
               title="By task and habit"
               column="Item"
               rows={stats.byItem.map((item) => {
-                const group = item.groupName ?? NO_GROUP_NAME;
                 return {
                   key: item.itemId,
                   label: item.name,
-                  note: item.kind === 'habit' ? `Habit · ${group}` : group,
+                  note: item.kind === 'habit' ? 'Habit' : undefined,
                   ms: item.ms,
                 };
               })}

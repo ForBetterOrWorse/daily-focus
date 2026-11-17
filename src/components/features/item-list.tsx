@@ -14,14 +14,13 @@ import { Menu } from '@/components/base/menu/menu';
 import { Stack } from '@/components/base/stack/stack';
 import { goalText } from '@/domain/goal-text';
 import { goalOn } from '@/domain/items';
-import type { DayKey, Group, Item } from '@/domain/types';
+import type { DayKey, Item } from '@/domain/types';
 import { GripVerticalIcon, PencilIcon, TrashIcon } from './app-icons';
 import { useAnnounce } from './live-announcer';
 import styles from './item-list.module.css';
 
 export interface ItemListProps {
   items: Item[];
-  groups: Group[];
   kind: 'habit' | 'task';
   day: DayKey;
   rowButtons: RefObject<Map<string, HTMLButtonElement>>;
@@ -35,10 +34,9 @@ export interface ItemListProps {
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-function details(item: Item, groups: Group[], day: DayKey) {
+function details(item: Item, day: DayKey) {
   const target = goalOn(item, day);
   return [
-    groups.find((group) => group.id === item.groupId)?.name,
     goalText({
       completion: item.completion,
       timerStyle: item.timerStyle,
@@ -56,7 +54,6 @@ function details(item: Item, groups: Group[], day: DayKey) {
 
 export function ItemList({
   items,
-  groups,
   kind,
   day,
   rowButtons,
@@ -279,8 +276,8 @@ export function ItemList({
             >
               <div className={styles['row-text']}>
                 <span className={styles.name}>{item.name}</span>
-                {details(item, groups, day) ? (
-                  <span className={styles.meta}>{details(item, groups, day)}</span>
+                {details(item, day) ? (
+                  <span className={styles.meta}>{details(item, day)}</span>
                 ) : null}
               </div>
               <Stack wrap={false}>

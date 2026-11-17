@@ -87,13 +87,7 @@ export function mergeData(local: AppData, incoming: AppData, now: number): AppDa
 
   const candidates = newerByKey(local.items, incoming.items, (item) => item.id);
   const removedIds = new Set(candidates.filter((item) => !isLive(item)).map((item) => item.id));
-  const groups = newerByKey(local.groups, incoming.groups, (group) => group.id).filter(isLive);
-  const groupIds = new Set(groups.map((group) => group.id));
-  const items = candidates
-    .filter((item) => !removedIds.has(item.id))
-    .map((item) =>
-      item.groupId !== null && !groupIds.has(item.groupId) ? { ...item, groupId: null } : item
-    );
+  const items = candidates.filter((item) => !removedIds.has(item.id));
   const itemById = new Map(items.map((item) => [item.id, item]));
   const orderFor = (section: 'habits' | 'tasks') =>
     mergeOrder(local.order[section], incoming.order[section], (id) => {
@@ -116,7 +110,6 @@ export function mergeData(local: AppData, incoming: AppData, now: number): AppDa
 
   const merged: AppData = {
     version: 1,
-    groups,
     items,
     order: { habits: orderFor('habits'), tasks: orderFor('tasks') },
     sessions: [...sessions.values()],

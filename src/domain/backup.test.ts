@@ -6,14 +6,11 @@ import type { AppData, HabitItem, QuickItem, Session, TaskItem } from './types';
 
 const minute = 60 * 1000;
 const now = new Date(2024, 0, 3, 9).getTime();
-const workGroupId = '00000000-0000-4000-8000-000000000001';
-
 function task(overrides: Partial<TaskItem> = {}): TaskItem {
   return {
     id: 'read',
     name: 'Read',
     kind: 'task',
-    groupId: null,
     completion: 'time',
     goals: [{ from: '2024-01-01', target: 30 }],
     timerStyle: 'free',
@@ -28,7 +25,6 @@ function quick(overrides: Partial<QuickItem> = {}): QuickItem {
     id: 'quick-1',
     name: 'Essay',
     kind: 'quick',
-    groupId: null,
     completion: 'time',
     goals: [],
     timerStyle: 'free',
@@ -60,7 +56,7 @@ describe('exportJson', () => {
 
   it('should round-trip through parseData', () => {
     const data = dataWith({
-      items: [task({ groupId: workGroupId }), quick()],
+      items: [task(), quick()],
       order: { habits: [], tasks: ['read'] },
       sessions: [session('read', '2024-01-03', 25)],
     });
@@ -90,6 +86,26 @@ function sessionIds(data: AppData): string[] {
 }
 
 describe('importPreview', () => {
+  it('should discard legacy groups while preserving their items', () => {
+    const legacy = {
+      ...emptyData(now),
+      groups: [{ id: 'work', name: 'Work', updatedAt: now }],
+      items: [{ ...task(), groupId: 'work' }],
+    };
+
+    const preview = importPreview(legacy);
+    if (!preview.ok) {
+      throw new Error('Expected legacy backup data to import');
+    }
+
+    expect(preview).toMatchObject({
+      ok: true,
+      data: { items: [{ id: 'read', name: 'Read' }] },
+    });
+    expect(preview.data).not.toHaveProperty('groups');
+    expect(preview.data.items[0]).not.toHaveProperty('groupId');
+  });
+
   it('should return the parsed data with counts and the export date', () => {
     const data = dataWith({
       items: [task(), quick()],
@@ -124,7 +140,7 @@ describe('importPreview', () => {
 describe('replaceData', () => {
   it('should restore the same data, grid, and streak into an empty browser', () => {
     const source = dataWith({
-      items: [task({ groupId: workGroupId }), habit(), quick()],
+      items: [task(), habit(), quick()],
       order: { habits: ['run'], tasks: ['read'] },
       sessions: [
         session('read', '2024-01-03', 25),
@@ -219,7 +235,6 @@ describe('mergeData', () => {
   it('should not bring back an item deleted on one device', () => {
     const local = dataWith({
       tombstones: { read: later },
-      groups: emptyData(now).groups,
     });
     const incoming = dataWith({
       items: [task()],
@@ -249,23 +264,6 @@ describe('mergeData', () => {
     const incoming = dataWith({ tombstones: { a: 7, b: 3, c: 1 } });
 
     expect(mergeData(local, incoming, later).tombstones).toEqual({ a: 7, b: 9, c: 1 });
-  });
-
-  it('should move items of a removed group to no group', () => {
-    const groupId = workGroupId;
-    const local = dataWith({
-      groups: emptyData(now).groups.filter((group) => group.id !== groupId),
-      tombstones: { [groupId]: later },
-    });
-    const incoming = dataWith({
-      items: [task({ groupId })],
-      order: { habits: [], tasks: ['read'] },
-    });
-
-    const merged = mergeData(local, incoming, later);
-
-    expect(merged.groups.some((group) => group.id === groupId)).toBe(false);
-    expect(merged.items[0].groupId).toBeNull();
   });
 
   it('should use the newer settings', () => {

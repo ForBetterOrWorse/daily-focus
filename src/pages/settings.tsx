@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Button } from '@/components/base/button/button';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Card } from '@/components/base/card/card';
 import { Container } from '@/components/base/container/container';
 import { Field } from '@/components/base/field/field';
@@ -7,10 +6,8 @@ import { Link } from '@/components/base/link/link';
 import { RadioGroup } from '@/components/base/radio-group/radio-group';
 import { Select } from '@/components/base/select/select';
 import { TextInput } from '@/components/base/text-input/text-input';
-import { PlusLgIcon } from '@/components/features/app-icons';
 import { AlertSettings } from '@/components/features/alert-settings';
 import { BackupSettings } from '@/components/features/backup-settings';
-import { GroupSettings } from '@/components/features/group-settings';
 import { MAX_SKIPS_PER_MONTH } from '@/domain/settings';
 import type { Settings as AppSettings } from '@/domain/types';
 import { useSeoMeta } from '@/hooks/use-seo-meta';
@@ -20,7 +17,6 @@ import { seoConfig } from '@/utils/seo.config';
 import styles from './settings.module.css';
 
 const SECTIONS = [
-  { id: 'settings-groups', label: 'Groups' },
   { id: 'settings-days', label: 'Days and streak' },
   { id: 'settings-alerts', label: 'Alerts' },
   { id: 'settings-appearance', label: 'Appearance' },
@@ -117,12 +113,10 @@ export function Settings() {
   const settings = useAppData(selectSettings);
   const dispatch = useDispatch();
   const { preference, setPreference } = useTheme();
-  const [addingGroup, setAddingGroup] = useState(false);
   const [currentSection, setCurrentSection] = useState(() => {
     const id = window.location.hash.slice(1);
     return SECTIONS.some((section) => section.id === id) ? id : SECTIONS[0].id;
   });
-  const addGroupButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const updateFromScroll = () => {
@@ -193,28 +187,6 @@ export function Settings() {
       </nav>
 
       <div className={styles.sections}>
-        <Section
-          id="settings-groups"
-          title="Groups"
-          action={
-            <Button
-              ref={addGroupButton}
-              variant="ghost"
-              size="md"
-              icon={PlusLgIcon}
-              aria-label="New group"
-              aria-expanded={addingGroup}
-              onClick={() => setAddingGroup((open) => !open)}
-            />
-          }
-        >
-          <GroupSettings
-            adding={addingGroup}
-            onAddingChange={setAddingGroup}
-            addButtonRef={addGroupButton}
-          />
-        </Section>
-
         <Section id="settings-days" title="Days and streak">
           <div className={styles.fields}>
             <Field label="Day starts at">

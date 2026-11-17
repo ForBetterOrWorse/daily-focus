@@ -18,7 +18,7 @@ function setup({ done = false }: { done?: boolean } = {}) {
   stores.push(store);
   store.dispatch({
     type: 'addItem',
-    item: { ...presetInput(TASK_PRESETS[1], []), name: 'Read' },
+    item: { ...presetInput(TASK_PRESETS[1]), name: 'Read' },
   });
   if (done) {
     store.dispatch({ type: 'tapItem', itemId: store.getState().data.items[0].id });
@@ -99,7 +99,7 @@ describe('ItemSection taps', () => {
     stores.push(store);
     store.dispatch({
       type: 'addItem',
-      item: { name: 'Water', groupId: null, kind: 'task', completion: 'count', target: 8 },
+      item: { name: 'Water', kind: 'task', completion: 'count', target: 8 },
     });
     render(
       <AppDataProvider store={store}>

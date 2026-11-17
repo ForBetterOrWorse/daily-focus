@@ -9,7 +9,6 @@ import { AppDataProvider } from '@/store/use-app-data';
 import { Settings } from './settings';
 
 const SECTION_IDS = [
-  ['Groups', 'settings-groups'],
   ['Days and streak', 'settings-days'],
   ['Alerts', 'settings-alerts'],
   ['Appearance', 'settings-appearance'],
@@ -98,7 +97,7 @@ describe('Settings', () => {
       window.history.replaceState(null, '', '/settings');
       renderSettings(setup());
       const nav = screen.getByRole('navigation', { name: 'Settings sections' });
-      expect(within(nav).getByRole('link', { name: 'Groups' })).toHaveAttribute(
+      expect(within(nav).getByRole('link', { name: 'Days and streak' })).toHaveAttribute(
         'aria-current',
         'location'
       );
@@ -108,7 +107,9 @@ describe('Settings', () => {
         'aria-current',
         'location'
       );
-      expect(within(nav).getByRole('link', { name: 'Groups' })).not.toHaveAttribute('aria-current');
+      expect(
+        within(nav).getByRole('link', { name: 'Days and streak' })
+      ).not.toHaveAttribute('aria-current');
     });
 
     it('should update the current link while scrolling through sections', () => {
@@ -117,7 +118,7 @@ describe('Settings', () => {
         vi.spyOn(
           screen.getByRole('heading', { level: 2, name: label }),
           'getBoundingClientRect'
-        ).mockReturnValue({ top: index < 3 ? -100 : 1000 } as DOMRect);
+        ).mockReturnValue({ top: index < 2 ? -100 : 1000 } as DOMRect);
       });
 
       fireEvent.scroll(window);
@@ -138,7 +139,7 @@ describe('Settings', () => {
         .spyOn(window, 'scrollY', 'get')
         .mockReturnValue(2000 - window.innerHeight - 100);
       SECTION_IDS.forEach(([label], index) => {
-        const tops = [-900, -700, -500, window.innerHeight * 0.6, window.innerHeight * 0.95];
+        const tops = [-900, -700, window.innerHeight * 0.6, window.innerHeight * 0.95];
         vi.spyOn(
           screen.getByRole('heading', { level: 2, name: label }),
           'getBoundingClientRect'
@@ -178,7 +179,7 @@ describe('Settings', () => {
       window.addEventListener('click', (event) => event.preventDefault(), { once: true });
       fireEvent.click(within(nav).getByRole('link', { name: 'Backup' }), { ctrlKey: true });
 
-      expect(within(nav).getByRole('link', { name: 'Groups' })).toHaveAttribute(
+      expect(within(nav).getByRole('link', { name: 'Days and streak' })).toHaveAttribute(
         'aria-current',
         'location'
       );

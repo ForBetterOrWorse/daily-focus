@@ -1,22 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { HABIT_PRESETS, presetInput, presetLabel, TASK_PRESETS } from './presets';
-import type { Group } from './types';
-
-const groups: Group[] = [
-  { id: 'work', name: 'Work', updatedAt: 0 },
-  { id: 'health', name: 'Health', updatedAt: 0 },
-  { id: 'learning', name: 'Learning', updatedAt: 0 },
-  { id: 'chores', name: 'Chores', updatedAt: 0 },
-  { id: 'hobby', name: 'Hobby', updatedAt: 0 },
-];
 
 describe('habit presets', () => {
-  it('should match each habit preset to its configured group and goal', () => {
-    expect(HABIT_PRESETS.map((preset) => presetInput(preset, groups))).toEqual([
-      { name: 'Drink water', groupId: 'health', kind: 'habit', completion: 'count', target: 8 },
+  it('should create standalone items with their configured goals', () => {
+    expect(HABIT_PRESETS.map((preset) => presetInput(preset))).toEqual([
+      { name: 'Drink water', kind: 'habit', completion: 'count', target: 8 },
       {
         name: 'Read',
-        groupId: 'learning',
         kind: 'habit',
         completion: 'time',
         target: 30,
@@ -24,7 +14,6 @@ describe('habit presets', () => {
       },
       {
         name: 'Study',
-        groupId: 'learning',
         kind: 'habit',
         completion: 'time',
         target: 50,
@@ -32,52 +21,34 @@ describe('habit presets', () => {
       },
       {
         name: 'Meditate',
-        groupId: 'health',
         kind: 'habit',
         completion: 'time',
         target: 10,
         timerStyle: 'free',
       },
-      { name: 'Walk', groupId: 'health', kind: 'habit', completion: 'check' },
-      { name: 'Journal', groupId: 'hobby', kind: 'habit', completion: 'check' },
+      { name: 'Walk', kind: 'habit', completion: 'check' },
+      { name: 'Journal', kind: 'habit', completion: 'check' },
     ]);
-  });
-
-  it('should leave a preset ungrouped when its group is missing or renamed', () => {
-    expect(
-      presetInput(
-        HABIT_PRESETS[0],
-        groups.filter((group) => group.name !== 'Health')
-      ).groupId
-    ).toBeNull();
-    expect(
-      presetInput(HABIT_PRESETS[0], [
-        ...groups.filter((group) => group.name !== 'Health'),
-        { id: 'wellness', name: 'Wellness', updatedAt: 0 },
-      ]).groupId
-    ).toBeNull();
   });
 });
 
 describe('task presets', () => {
-  it('should match each task preset to its configured group and goal', () => {
-    expect(TASK_PRESETS.map((preset) => presetInput(preset, groups))).toEqual([
-      { name: 'Plan the week', groupId: 'work', kind: 'task', completion: 'check' },
-      { name: 'Reply to emails', groupId: 'work', kind: 'task', completion: 'check' },
+  it('should create standalone items with their configured goals', () => {
+    expect(TASK_PRESETS.map((preset) => presetInput(preset))).toEqual([
+      { name: 'Plan the week', kind: 'task', completion: 'check' },
+      { name: 'Reply to emails', kind: 'task', completion: 'check' },
       {
-        name: 'Write a draft',
-        groupId: 'work',
+        name: 'Focused work',
         kind: 'task',
         completion: 'time',
         target: 50,
         timerStyle: 'sessions',
       },
       {
-        name: 'Study for exam',
-        groupId: 'learning',
+        name: 'Prepare a presentation',
         kind: 'task',
         completion: 'time',
-        target: 50,
+        target: 25,
         timerStyle: 'sessions',
       },
     ]);
@@ -98,5 +69,9 @@ describe('preset labels', () => {
     expect(
       [HABIT_PRESETS[4], HABIT_PRESETS[5], ...TASK_PRESETS.slice(0, 2)].map(presetLabel)
     ).toEqual(['Walk', 'Journal', 'Plan the week', 'Reply to emails']);
+  });
+
+  it('should label the presentation task as one session', () => {
+    expect(presetLabel(TASK_PRESETS[3])).toBe('Prepare a presentation 1 session');
   });
 });

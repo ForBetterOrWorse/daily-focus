@@ -9,7 +9,6 @@ describe('reduce', () => {
     const base = emptyData(NOW);
     const input = {
       kind: 'habit',
-      groupId: null,
       completion: 'time',
       target: 30,
       timerStyle: 'free',
@@ -23,21 +22,6 @@ describe('reduce', () => {
 
     expect(paused.run).toBeNull();
     expect(paused.cardItemId).toBe(study.id);
-  });
-
-  it('should add, rename, and remove a group, and restore brings it back', () => {
-    const data = emptyData(NOW);
-    const added = reduce(data, { type: 'addGroup', name: 'Music' }, NOW);
-    const music = added.groups.find((group) => group.name === 'Music');
-    expect(music).toBeDefined();
-
-    const renamed = reduce(added, { type: 'renameGroup', groupId: music!.id, name: 'Sound' }, NOW);
-    const removed = reduce(renamed, { type: 'removeGroup', groupId: music!.id }, NOW);
-    const restored = reduce(removed, { type: 'restore', snapshot: renamed }, NOW);
-
-    expect(renamed.groups.some((group) => group.name === 'Sound')).toBe(true);
-    expect(removed.groups.some((group) => group.id === music!.id)).toBe(false);
-    expect(restored.groups.some((group) => group.id === music!.id)).toBe(true);
   });
 
   it('should update settings', () => {
@@ -61,21 +45,10 @@ describe('reduce', () => {
 
   it('should replace local data on importData replace and keep local firstUseAt', () => {
     const local = emptyData(NOW);
-    const incoming = reduce(emptyData(NOW - 1000), { type: 'addGroup', name: 'Music' }, NOW);
+    const incoming = emptyData(NOW - 1000);
 
     const next = reduce(local, { type: 'importData', mode: 'replace', incoming }, NOW);
 
-    expect(next.groups.some((group) => group.name === 'Music')).toBe(true);
     expect(next.meta.firstUseAt).toBe(local.meta.firstUseAt);
-  });
-
-  it('should merge incoming groups on importData merge', () => {
-    const local = reduce(emptyData(NOW), { type: 'addGroup', name: 'Sound' }, NOW);
-    const incoming = reduce(emptyData(NOW), { type: 'addGroup', name: 'Music' }, NOW);
-
-    const next = reduce(local, { type: 'importData', mode: 'merge', incoming }, NOW);
-
-    expect(next.groups.some((group) => group.name === 'Sound')).toBe(true);
-    expect(next.groups.some((group) => group.name === 'Music')).toBe(true);
   });
 });

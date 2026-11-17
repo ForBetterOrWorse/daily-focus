@@ -17,7 +17,7 @@ function seedChecks(days: Array<[DayKey, number]>) {
   names.forEach((name) =>
     builder.dispatch({
       type: 'addItem',
-      item: { kind: 'habit', name, groupId: null, completion: 'check' },
+      item: { kind: 'habit', name, completion: 'check' },
     })
   );
   const data = builder.getState().data;

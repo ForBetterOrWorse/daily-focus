@@ -26,7 +26,7 @@ function setup(names = ['Read', 'Walk']) {
   names.forEach((name) =>
     store.dispatch({
       type: 'addItem',
-      item: { kind: 'task', name, groupId: null, completion: 'check' },
+      item: { kind: 'task', name, completion: 'check' },
     })
   );
   render(
@@ -135,7 +135,6 @@ describe('ItemDrawer history and motion', () => {
       {
         kind: 'habit',
         name: 'Read',
-        groupId: null,
         completion: 'time',
         target: 30,
         timerStyle: 'free',
@@ -145,14 +144,13 @@ describe('ItemDrawer history and motion', () => {
     );
     data = addItem(
       data,
-      { kind: 'habit', name: 'Meditate', groupId: null, completion: 'check', days: [0] },
+      { kind: 'habit', name: 'Meditate', completion: 'check', days: [0] },
       now
     );
     render(
       <ItemDrawer
         open
         kind="habit"
-        groups={data.groups}
         items={data.items}
         start={{ kind: 'list' }}
         day="2026-11-08"
@@ -231,7 +229,7 @@ describe('ItemDrawer interrupted deletion', () => {
     const onDelete = vi.fn();
     const data = addItem(
       emptyData(Date.now()),
-      { kind: 'task', name: 'Walk', groupId: null, completion: 'check' },
+      { kind: 'task', name: 'Walk', completion: 'check' },
       Date.now()
     );
     Object.defineProperty(Element.prototype, 'animate', {
@@ -242,7 +240,6 @@ describe('ItemDrawer interrupted deletion', () => {
       <ItemDrawer
         open
         kind="task"
-        groups={data.groups}
         items={data.items}
         start={{ kind: 'list' }}
         day="2026-11-08"

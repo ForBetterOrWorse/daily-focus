@@ -24,7 +24,6 @@ function task(overrides: Partial<TaskItem> = {}): TaskItem {
     id: 'essay',
     name: 'Essay',
     kind: 'task',
-    groupId: null,
     completion: 'time',
     goals: [{ from: '2024-01-01', target: 30 }],
     timerStyle: 'free',
@@ -49,7 +48,7 @@ function quick(id: string, overrides: Partial<QuickItem> = {}): QuickItem {
     goals: [],
     kind: 'quick',
     completion: 'time',
-    groupId: null,
+
     timerStyle: 'free',
     number: 1,
     day: today,

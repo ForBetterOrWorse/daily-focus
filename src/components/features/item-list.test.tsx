@@ -17,7 +17,7 @@ const day = '2026-11-01';
 function makeItems() {
   let data = emptyData(now);
   for (const name of ['Read', 'Write', 'Walk']) {
-    data = addItem(data, { kind: 'task', name, groupId: null, completion: 'check' }, now);
+    data = addItem(data, { kind: 'task', name, completion: 'check' }, now);
   }
   return data;
 }
@@ -29,7 +29,6 @@ function renderList(items = makeItems().items, kind: 'habit' | 'task' = 'task') 
     <LiveAnnouncerProvider>
       <ItemList
         items={items}
-        groups={makeItems().groups}
         kind={kind}
         day={day}
         rowButtons={{ current: new Map() }}
@@ -52,7 +51,6 @@ describe('ItemList', () => {
       {
         kind: 'habit',
         name: 'Read',
-        groupId: data.groups[0].id,
         completion: 'time',
         target: 30,
         timerStyle: 'free',
@@ -61,7 +59,7 @@ describe('ItemList', () => {
       now
     );
     const { onDelete } = renderList(data.items, 'habit');
-    expect(screen.getByText(`${data.groups[0].name} · 30 min · Every day`)).toBeVisible();
+    expect(screen.getByText('30 min · Every day')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Edit Read' })).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Delete Read' }));
     expect(onDelete).toHaveBeenCalledWith(data.items[0]);
@@ -197,7 +195,7 @@ describe('Item drawer integration', () => {
       for (const name of ['First', 'Second']) {
         store.dispatch({
           type: 'addItem',
-          item: { kind: 'habit', name, groupId: null, completion: 'check' },
+          item: { kind: 'habit', name, completion: 'check' },
         });
       }
       store.dispatch({
@@ -205,7 +203,6 @@ describe('Item drawer integration', () => {
         item: {
           kind: 'habit',
           name: 'Off day',
-          groupId: null,
           completion: 'check',
           days: [(weekdayOf(today) + 1) % 7],
         },

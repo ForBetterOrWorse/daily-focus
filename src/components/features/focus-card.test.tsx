@@ -23,7 +23,7 @@ function CardHarness() {
 }
 
 function timeItem(name: string, timerStyle: 'sessions' | 'free' = 'sessions'): ItemInput {
-  return { kind: 'habit', name, groupId: null, completion: 'time', target: 30, timerStyle };
+  return { kind: 'habit', name, completion: 'time', target: 30, timerStyle };
 }
 
 function setup(...items: ItemInput[]) {
@@ -207,8 +207,7 @@ describe('FocusCard', () => {
   it('should leave the group name off the card', () => {
     const store = createStore({ storage: window.localStorage, now: Date.now });
     stores.push(store);
-    const [work] = store.getState().data.groups;
-    store.dispatch({ type: 'addItem', item: { ...timeItem('Read'), groupId: work.id } });
+    store.dispatch({ type: 'addItem', item: timeItem('Read') });
     const { data } = store.getState();
     store.dispatch({ type: 'restore', snapshot: { ...data, cardItemId: data.items[0].id } });
     render(

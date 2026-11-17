@@ -6,13 +6,7 @@ describe('emptyData', () => {
   it('should create defaults and round-trip through the data parser', () => {
     const data = emptyData(1_700_000_000_000);
 
-    expect(data.groups.map((group) => group.name)).toEqual([
-      'Work',
-      'Health',
-      'Learning',
-      'Chores',
-      'Hobby',
-    ]);
+    expect(data).not.toHaveProperty('groups');
     expect(data.meta).toMatchObject({
       firstUseAt: 1_700_000_000_000,
       quickStyle: 'free',
@@ -30,8 +24,8 @@ describe('parseData', () => {
   it.each([
     ['a non-object', null],
     ['an array', []],
-    ['a missing field', { ...validData, groups: undefined }],
-    ['a wrong field type', { ...validData, groups: 'groups' }],
+    ['a missing field', { ...validData, items: undefined }],
+    ['a wrong field type', { ...validData, items: 'items' }],
     ['an unsupported version', { ...validData, version: 2 }],
     [
       'a malformed nested value',
@@ -50,7 +44,6 @@ describe('parseData', () => {
       id: 'quick-1',
       kind: 'quick',
       name: '',
-      groupId: null,
       completion: 'time',
       goals: [{ from: '2026-01-01', target: 1 }],
       timerStyle: 'free',
@@ -78,7 +71,6 @@ describe('parseData', () => {
       id: 'task-1',
       kind: 'task',
       name: 'Read',
-      groupId: null,
       completion,
       goals: [{ from: '2026-01-01', target }],
       createdAt: 1,
@@ -95,7 +87,6 @@ describe('parseData', () => {
       id: 'task-1',
       kind: 'task',
       name: 'Read',
-      groupId: null,
       completion: 'count',
       goals: [{ from: '2026-01-01', target: 50 }],
       createdAt: 1,
@@ -119,7 +110,6 @@ describe('parseData', () => {
       id: 'habit-1',
       kind: 'habit',
       name: 'Read',
-      groupId: null,
       completion: 'check',
       goals: [],
       createdAt: 1,
@@ -155,18 +145,31 @@ describe('parseData', () => {
     expect(() => parseData(withMissingRun)).toThrow('data.run.itemId');
   });
 
-  it('should drop unknown fields at every parsed level', () => {
+  it('should drop unknown and legacy group fields at every parsed level', () => {
     const input = {
       ...validData,
       unexpected: 'top-level',
-      groups: [{ ...validData.groups[0], unexpected: 'group-level' }],
+      groups: [{ id: 'work', name: 'Work', updatedAt: 1 }],
+      items: [
+        {
+          id: 'task-1',
+          kind: 'task',
+          name: 'Read',
+          groupId: 'work',
+          completion: 'check',
+          goals: [],
+          createdAt: 1,
+          updatedAt: 1,
+        },
+      ],
       settings: { ...validData.settings, unexpected: 'settings-level' },
     };
 
     const parsed = parseData(input);
 
     expect(parsed).not.toHaveProperty('unexpected');
-    expect(parsed.groups[0]).not.toHaveProperty('unexpected');
+    expect(parsed).not.toHaveProperty('groups');
+    expect(parsed.items[0]).not.toHaveProperty('groupId');
     expect(parsed.settings).not.toHaveProperty('unexpected');
   });
 

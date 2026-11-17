@@ -185,16 +185,11 @@ async function addTimeItem(
   user: User,
   kind: 'task' | 'habit',
   name: string,
-  minutes: number,
-  group?: string
+  minutes: number
 ) {
   await user.click(screen.getByRole('button', { name: `New ${kind}` }));
   const drawer = screen.getByRole('dialog', { name: `New ${kind}` });
   await user.type(within(drawer).getByRole('textbox', { name: 'Name' }), name);
-  if (group) {
-    await user.click(within(drawer).getByRole('combobox', { name: 'Group' }));
-    await user.click(screen.getByRole('option', { name: group }));
-  }
   await user.click(within(drawer).getByRole('radio', { name: 'Reach a time' }));
   const minutesInput = within(drawer).getByRole('spinbutton', { name: 'Minutes' });
   await user.clear(minutesInput);
@@ -255,9 +250,8 @@ describe('success criteria', () => {
     it('should fill the square with a 10-minute Work task, then darken it with a Read 30 min habit and read a streak of 1', async () => {
       const { user, store } = launchApp();
 
-      await addTimeItem(user, 'task', 'Write report', 10, 'Work');
-      const work = store.getState().data.groups.find((group) => group.name === 'Work');
-      expect(itemNamed(store, 'Write report')).toMatchObject({ kind: 'task', groupId: work?.id });
+      await addTimeItem(user, 'task', 'Write report', 10);
+      expect(itemNamed(store, 'Write report')).toMatchObject({ kind: 'task' });
 
       pinOnCard(store, 'Write report');
       await user.click(screen.getByRole('button', { name: 'Start' }));
@@ -362,7 +356,7 @@ describe('success criteria', () => {
     await user.click(screen.getByRole('button', { name: 'Done' }));
     dispatch(store, {
       type: 'addItem',
-      item: { kind: 'habit', name: 'Journal', groupId: null, completion: 'check' },
+      item: { kind: 'habit', name: 'Journal', completion: 'check' },
     });
     await user.click(screen.getByRole('button', { name: /^Walk\. Check off/ }));
     await user.click(screen.getByRole('button', { name: /^Journal\. Check off/ }));
@@ -397,7 +391,6 @@ describe('success criteria', () => {
       item: {
         kind: 'habit',
         name: 'Read',
-        groupId: null,
         completion: 'time',
         target: 30,
         timerStyle: 'free',
@@ -436,16 +429,15 @@ describe('success criteria', () => {
     });
     const add = (item: Extract<Action, { type: 'addItem' }>['item']) =>
       dispatch(store, { type: 'addItem', item });
-    add({ kind: 'habit', name: 'Walk', groupId: null, completion: 'check' });
+    add({ kind: 'habit', name: 'Walk', completion: 'check' });
     add({
       kind: 'habit',
       name: 'Read',
-      groupId: null,
       completion: 'time',
       target: 30,
       timerStyle: 'free',
     });
-    add({ kind: 'task', name: 'Draft', groupId: null, completion: 'time', target: 20 });
+    add({ kind: 'task', name: 'Draft', completion: 'time', target: 20 });
     dispatch(store, { type: 'tapItem', itemId: itemNamed(store, 'Walk').id });
     track(store, itemNamed(store, 'Read').id, 30);
     dispatch(store, { type: 'newQuickSession', start: true, name: 'Scratch' });
@@ -481,7 +473,6 @@ describe('success criteria', () => {
       'task',
     ]);
     expect(restored.items).toEqual(original.items);
-    expect(restored.groups).toEqual(original.groups);
     expect(restored.sessions).toEqual(original.sessions);
     expect(restored.marks).toEqual(original.marks);
     expect(restored.settings).toEqual(original.settings);
@@ -513,14 +504,14 @@ describe('success criteria', () => {
 
     deviceB.dispatch({
       type: 'addItem',
-      item: { kind: 'task', name: 'Plan', groupId: null, completion: 'time', target: 20 },
+      item: { kind: 'task', name: 'Plan', completion: 'time', target: 20 },
     });
     deviceB.dispatch({ type: 'start', itemId: itemNamed(deviceB, 'Plan').id });
     clock += 10 * MINUTE;
     deviceB.dispatch({ type: 'pause' });
     deviceA.dispatch({
       type: 'addItem',
-      item: { kind: 'habit', name: 'Read', groupId: null, completion: 'time', target: 30 },
+      item: { kind: 'habit', name: 'Read', completion: 'time', target: 30 },
     });
     deviceA.dispatch({ type: 'start', itemId: itemNamed(deviceA, 'Read').id });
     clock += 20 * MINUTE;
@@ -615,7 +606,7 @@ describe('success criteria', () => {
     const { user, store } = launchApp({ now: NOV_16 });
     dispatch(store, {
       type: 'addItem',
-      item: { kind: 'habit', name: 'Walk', groupId: null, completion: 'check' },
+      item: { kind: 'habit', name: 'Walk', completion: 'check' },
     });
     const walkId = itemNamed(store, 'Walk').id;
     dispatch(store, { type: 'tapItem', itemId: walkId });

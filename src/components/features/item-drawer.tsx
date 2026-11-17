@@ -4,7 +4,7 @@ import { Drawer } from '@/components/base/drawer/drawer';
 import { ToastProvider } from '@/components/base/toast/toast';
 import { useToast } from '@/components/base/toast/toast-context';
 import type { ItemInput } from '@/domain/items';
-import type { DayKey, Group, Item } from '@/domain/types';
+import type { DayKey, Item } from '@/domain/types';
 import { DeleteDialog } from './delete-dialog';
 import { ItemForm } from './item-form';
 import { ItemList } from './item-list';
@@ -18,7 +18,6 @@ export type DrawerView =
 export interface ItemDrawerProps {
   open: boolean;
   kind: 'habit' | 'task';
-  groups: Group[];
   items: Item[];
   start: DrawerView;
   triggerElement?: HTMLElement | null;
@@ -34,7 +33,6 @@ export interface ItemDrawerProps {
 export function ItemDrawer({
   open,
   kind,
-  groups,
   items,
   start,
   triggerElement,
@@ -189,7 +187,6 @@ export function ItemDrawer({
         : `New ${kind}`;
   const formProps: ItemFormProps = {
     kind,
-    groups,
     item,
     today: item?.completion === 'count' ? amountOf(item) : undefined,
     nameInput,
@@ -226,7 +223,6 @@ export function ItemDrawer({
                 <LiveAnnouncerProvider>
                   <ItemList
                     items={items}
-                    groups={groups}
                     kind={kind}
                     day={day}
                     rowButtons={rowButtons}

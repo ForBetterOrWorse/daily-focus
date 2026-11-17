@@ -1,10 +1,9 @@
 import { goalText } from './goal-text';
 import type { ItemInput } from './items';
-import type { Group, TimerStyle } from './types';
+import type { TimerStyle } from './types';
 
 interface PresetBase {
   name: string;
-  groupName: string;
 }
 
 type Preset = PresetBase &
@@ -15,39 +14,36 @@ type Preset = PresetBase &
   );
 
 export const HABIT_PRESETS = [
-  { name: 'Drink water', groupName: 'Health', completion: 'count', target: 8 },
-  { name: 'Read', groupName: 'Learning', completion: 'time', target: 30, timerStyle: 'free' },
-  { name: 'Study', groupName: 'Learning', completion: 'time', target: 50, timerStyle: 'sessions' },
-  { name: 'Meditate', groupName: 'Health', completion: 'time', target: 10, timerStyle: 'free' },
-  { name: 'Walk', groupName: 'Health', completion: 'check' },
-  { name: 'Journal', groupName: 'Hobby', completion: 'check' },
+  { name: 'Drink water', completion: 'count', target: 8 },
+  { name: 'Read', completion: 'time', target: 30, timerStyle: 'free' },
+  { name: 'Study', completion: 'time', target: 50, timerStyle: 'sessions' },
+  { name: 'Meditate', completion: 'time', target: 10, timerStyle: 'free' },
+  { name: 'Walk', completion: 'check' },
+  { name: 'Journal', completion: 'check' },
 ] as const satisfies readonly Preset[];
 
 export const TASK_PRESETS = [
-  { name: 'Plan the week', groupName: 'Work', completion: 'check' },
-  { name: 'Reply to emails', groupName: 'Work', completion: 'check' },
+  { name: 'Plan the week', completion: 'check' },
+  { name: 'Reply to emails', completion: 'check' },
   {
-    name: 'Write a draft',
-    groupName: 'Work',
+    name: 'Focused work',
     completion: 'time',
     target: 50,
     timerStyle: 'sessions',
   },
   {
-    name: 'Study for exam',
-    groupName: 'Learning',
+    name: 'Prepare a presentation',
     completion: 'time',
-    target: 50,
+    target: 25,
     timerStyle: 'sessions',
   },
 ] as const satisfies readonly Preset[];
 
-export function presetInput(preset: Preset, groups: readonly Group[]): ItemInput {
+export function presetInput(preset: Preset): ItemInput {
   const kind: ItemInput['kind'] = HABIT_PRESETS.some((habitPreset) => habitPreset === preset)
     ? 'habit'
     : 'task';
-  const groupId = groups.find((group) => group.name === preset.groupName)?.id ?? null;
-  const base = { name: preset.name, groupId, kind };
+  const base = { name: preset.name, kind };
 
   if (preset.completion === 'check') {
     return { ...base, completion: 'check' };

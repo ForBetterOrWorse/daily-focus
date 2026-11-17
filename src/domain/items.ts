@@ -6,7 +6,6 @@ export type ItemSection = 'habits' | 'tasks';
 
 interface ItemInputBase {
   name: string;
-  groupId: string | null;
   kind: 'habit' | 'task';
   days?: number[];
 }
@@ -67,7 +66,6 @@ function itemFields(input: ItemInput): ItemFields {
 
   const base = {
     name,
-    groupId: input.groupId,
     completion: input.completion,
     ...(input.completion === 'time' && input.timerStyle !== undefined
       ? { timerStyle: input.timerStyle }

@@ -13,7 +13,6 @@ function task(overrides: Partial<TaskItem> = {}): TaskItem {
     id: 'read',
     name: 'Read',
     kind: 'task',
-    groupId: null,
     completion: 'time',
     goals: [{ from: '2024-01-01', target: 30 }],
     timerStyle: 'free',
@@ -35,7 +34,6 @@ function quick(overrides: Partial<QuickItem> = {}): QuickItem {
     kind: 'quick',
     completion: 'time',
     goals: [],
-    groupId: null,
     timerStyle: 'free',
     number: 1,
     day: '2024-01-02',
@@ -56,21 +54,17 @@ function session(itemId: string, day: string, minutes: number): Session {
 function dataWith(items: Item[], sessions: Session[]): AppData {
   return {
     ...emptyData(now),
-    groups: [
-      { id: 'learning', name: 'Learning', updatedAt: now },
-      { id: 'health', name: 'Health', updatedAt: now },
-    ],
     items,
     sessions,
   };
 }
 
 describe('weekStats', () => {
-  it('should total the sessions of the week by group and by item', () => {
+  it('should total the sessions of the week by item', () => {
     const data = dataWith(
       [
-        task({ id: 'read', name: 'Read', groupId: 'learning' }),
-        habit({ id: 'run', name: 'Run', groupId: 'health' }),
+        task({ id: 'read', name: 'Read' }),
+        habit({ id: 'run', name: 'Run' }),
         task({ id: 'misc', name: 'Misc' }),
       ],
       [
@@ -83,22 +77,17 @@ describe('weekStats', () => {
 
     expect(weekStats(data, weekStart)).toEqual({
       totalMs: 70 * minute,
-      byGroup: [
-        { groupId: 'learning', name: 'Learning', ms: 45 * minute },
-        { groupId: 'health', name: 'Health', ms: 20 * minute },
-        { groupId: null, name: 'No group', ms: 5 * minute },
-      ],
       byItem: [
-        { itemId: 'read', name: 'Read', kind: 'task', groupName: 'Learning', ms: 45 * minute },
-        { itemId: 'run', name: 'Run', kind: 'habit', groupName: 'Health', ms: 20 * minute },
-        { itemId: 'misc', name: 'Misc', kind: 'task', groupName: null, ms: 5 * minute },
+        { itemId: 'read', name: 'Read', kind: 'task', ms: 45 * minute },
+        { itemId: 'run', name: 'Run', kind: 'habit', ms: 20 * minute },
+        { itemId: 'misc', name: 'Misc', kind: 'task', ms: 5 * minute },
       ],
     });
   });
 
   it('should leave out sessions outside the week', () => {
     const data = dataWith(
-      [task({ groupId: 'learning' })],
+      [task()],
       [
         session('read', '2023-12-31', 40),
         session('read', '2024-01-02', 10),
@@ -136,11 +125,11 @@ describe('weekStats', () => {
     const stats = weekStats(saved, weekStart);
 
     expect(stats.byItem).toEqual([
-      { itemId: 'q1', name: 'Email', kind: 'task', groupName: null, ms: 10 * minute },
+      { itemId: 'q1', name: 'Email', kind: 'task', ms: 10 * minute },
     ]);
   });
 
-  it('should sum quick sessions into No group', () => {
+  it('should total quick session time by item', () => {
     const data = dataWith(
       [
         quick({ id: 'q1', name: 'A' }),
@@ -154,15 +143,11 @@ describe('weekStats', () => {
       ]
     );
 
-    expect(weekStats(data, weekStart).byGroup).toEqual([
-      { groupId: null, name: 'No group', ms: 35 * minute },
+    expect(weekStats(data, weekStart).byItem.map(({ ms }) => ms)).toEqual([
+      20 * minute,
+      10 * minute,
+      5 * minute,
     ]);
-  });
-
-  it('should omit No group when it has no time', () => {
-    const data = dataWith([task({ groupId: 'learning' })], [session('read', '2024-01-02', 10)]);
-
-    expect(weekStats(data, weekStart).byGroup.map(({ groupId }) => groupId)).toEqual(['learning']);
   });
 
   it('should sort by time, largest first, then by name', () => {
@@ -189,7 +174,6 @@ describe('weekStats', () => {
   it('should return empty lists for a week without sessions', () => {
     expect(weekStats(dataWith([task()], []), weekStart)).toEqual({
       totalMs: 0,
-      byGroup: [],
       byItem: [],
     });
   });

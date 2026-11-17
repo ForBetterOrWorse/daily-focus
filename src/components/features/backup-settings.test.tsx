@@ -21,7 +21,7 @@ function backupFile(items: number, sessions: number): File {
   for (let index = 1; index <= items; index += 1) {
     source.dispatch({
       type: 'addItem',
-      item: { kind: 'habit', name: `Walk ${index}`, groupId: null, completion: 'check' },
+      item: { kind: 'habit', name: `Walk ${index}`, completion: 'check' },
     });
   }
   const data = source.getState().data;
@@ -46,7 +46,7 @@ function setup() {
   stores.push(store);
   store.dispatch({
     type: 'addItem',
-    item: { kind: 'habit', name: 'Read', groupId: null, completion: 'check' },
+    item: { kind: 'habit', name: 'Read', completion: 'check' },
   });
   render(
     <AppDataProvider store={store}>

@@ -15,7 +15,6 @@ function task(overrides: Partial<TaskItem> = {}): TaskItem {
     id: 'read',
     name: 'Read',
     kind: 'task',
-    groupId: null,
     completion: 'time',
     goals: [{ from: '2024-01-01', target: 30 }],
     timerStyle: 'free',
@@ -43,7 +42,6 @@ function quick(overrides: Partial<QuickItem> = {}): QuickItem {
     completion: 'time',
     goals: [],
     timerStyle: 'free',
-    groupId: null,
     number: 3,
     day: today,
     ...overrides,
@@ -71,7 +69,6 @@ describe('item actions', () => {
         type: 'addItem',
         item: {
           name: ' Read ',
-          groupId: null,
           kind: 'habit',
           completion: 'time',
           target: 30,
@@ -114,7 +111,6 @@ describe('item actions', () => {
         itemId: existing.id,
         item: {
           name: 'Read',
-          groupId: null,
           kind: 'task',
           completion: 'time',
           target: 60,
@@ -161,7 +157,6 @@ describe('item actions', () => {
         itemId: existing.id,
         item: {
           name: existing.name,
-          groupId: existing.groupId,
           kind: 'task',
           completion: 'time',
           target: 30,
@@ -203,7 +198,7 @@ describe('item actions', () => {
       {
         type: 'updateItem',
         itemId: existing.id,
-        item: { name: 'Read', groupId: null, kind: 'task', completion: 'count', target: 3 },
+        item: { name: 'Read', kind: 'task', completion: 'count', target: 3 },
       },
       now + minute
     );
@@ -226,7 +221,7 @@ describe('item actions', () => {
         emptyData(now),
         {
           type: 'addItem',
-          item: { name: 'Read', groupId: null, kind: 'task', completion, target },
+          item: { name: 'Read', kind: 'task', completion, target },
         },
         now
       )
@@ -240,7 +235,7 @@ describe('item actions', () => {
   ] as const)('should accept the largest $completion goal of $target', ({ completion, target }) => {
     const added = reduce(
       emptyData(now),
-      { type: 'addItem', item: { name: 'Read', groupId: null, kind: 'task', completion, target } },
+      { type: 'addItem', item: { name: 'Read', kind: 'task', completion, target } },
       now
     );
 

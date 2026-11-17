@@ -141,7 +141,6 @@ describe('Today', () => {
       item: {
         kind: 'habit',
         name: 'Walk',
-        groupId: null,
         completion: 'check',
         days: [(weekdayOf(day) + 1) % 7],
       },
@@ -152,35 +151,24 @@ describe('Today', () => {
     expect(screen.getByRole('button', { name: 'Edit habits' })).toBeVisible();
   });
 
-  it('should group tasks in group order and place done tasks last within each group', async () => {
+  it('should show tasks as standalone items and place done tasks last', async () => {
     const user = userEvent.setup();
     const store = setup();
-    const [work, health] = store.getState().data.groups;
-    for (const [name, groupId] of [
-      ['Ungrouped', null],
-      ['Health task', health.id],
-      ['Finished', work.id],
-      ['Open', work.id],
-    ] as const) {
+    for (const name of ['First', 'Finished', 'Open']) {
       store.dispatch({
         type: 'addItem',
-        item: { kind: 'task', name, groupId, completion: 'check' },
+        item: { kind: 'task', name, completion: 'check' },
       });
     }
     renderToday(store);
     await user.click(screen.getByRole('button', { name: 'Finished. Check off' }));
     const tasks = screen.getByRole('region', { name: 'Tasks' });
-    const lists = within(tasks).getAllByRole('list');
-    expect(lists.map((list) => list.getAttribute('aria-label'))).toEqual([
-      'Tasks: Work',
-      'Tasks: Health',
-      'Tasks',
-    ]);
+    const list = within(tasks).getByRole('list', { name: 'Tasks' });
     expect(
-      within(lists[0])
+      within(list)
         .getAllByRole('button')
         .map((button) => button.textContent)
-    ).toEqual(['Open', 'Finished']);
+    ).toEqual(['First', 'Open', 'Finished']);
   });
 
   it('should show the sections and a jump button, and no columns toggle, below 1024px', async () => {
@@ -204,7 +192,7 @@ describe('Today', () => {
       if (kind === 'named') {
         store.dispatch({
           type: 'addItem',
-          item: { kind: 'task', name, groupId: null, completion: 'check' },
+          item: { kind: 'task', name, completion: 'check' },
         });
       } else {
         store.dispatch({ type: 'newQuickSession', start: false });

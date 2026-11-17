@@ -20,7 +20,6 @@ function dataWithTimeItems(...ids: string[]): AppData {
   const items: Item[] = ids.map((id) => ({
     id,
     name: id,
-    groupId: null,
     kind: 'task',
     completion: 'time',
     goals: [{ from: '2024-01-01', target: 60 }],
@@ -60,7 +59,6 @@ describe('timer clock', () => {
       id: 'quick',
       name: '',
       kind: 'quick',
-      groupId: null,
       completion: 'time',
       goals: [],
       timerStyle: 'free',

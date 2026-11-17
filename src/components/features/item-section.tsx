@@ -65,20 +65,12 @@ export function ItemSection({
     .filter((item) => isDoneOn(data, item, day, now))
     .map((item) => item.id)
     .join(',');
-  const groups = [
-    ...data.groups.map((group) => ({ id: group.id, name: group.name })),
-    { id: null, name: '' },
-  ]
-    .map((group) => {
-      const members = todayItems.filter((item) => item.groupId === group.id);
-      if (section === 'tasks') {
-        members.sort(
+  const orderedItems =
+    section === 'tasks'
+      ? [...todayItems].sort(
           (a, b) => Number(isDoneOn(data, a, day, now)) - Number(isDoneOn(data, b, day, now))
-        );
-      }
-      return { ...group, members };
-    })
-    .filter((group) => group.members.length > 0);
+        )
+      : todayItems;
 
   useEffect(() => {
     const current = new Set(doneKey === '' ? [] : doneKey.split(','));
@@ -121,7 +113,7 @@ export function ItemSection({
       presets
         .filter((preset) => picked?.includes(preset.name))
         .forEach((preset) => {
-          dispatch({ type: 'addItem', item: presetInput(preset, data.groups) });
+          dispatch({ type: 'addItem', item: presetInput(preset) });
         });
     }
     setRevealing(add && picked !== null && picked.length > 0);
@@ -219,49 +211,37 @@ export function ItemSection({
       {items.length > 0 && todayItems.length === 0 && section === 'habits' ? (
         <p className={styles.empty}>No habits today.</p>
       ) : null}
-      <div className={styles.groups}>
-        {groups.map((group) => (
-          <div
-            key={group.id ?? 'ungrouped'}
-            className={styles.reveal}
-            data-revealing={revealing}
-            onAnimationEnd={(event) => {
-              if (event.target === event.currentTarget) {
-                setRevealing(false);
-              }
-            }}
-          >
-            <div className={styles.group}>
-              {group.id === null ? null : <h3 className={styles['group-title']}>{group.name}</h3>}
-              <ul
-                className={styles.items}
-                aria-label={group.id === null ? title : `${title}: ${group.name}`}
-              >
-                {group.members.map((item) => {
-                  const amount = amountOn(data, item, day, now);
-                  return (
-                    <ItemTile
-                      key={item.id}
-                      item={item}
-                      amount={item.completion === 'time' ? Math.floor(amount) : amount}
-                      goal={goalOn(item, day) ?? undefined}
-                      done={isDoneOn(data, item, day, now)}
-                      celebrate={!reducedMotion && celebrating.includes(item.id)}
-                      running={data.run?.itemId === item.id}
-                      onTap={() => dispatch({ type: 'tapItem', itemId: item.id })}
-                    />
-                  );
-                })}
-              </ul>
-            </div>
-          </div>
-        ))}
+      <div
+        className={styles.reveal}
+        data-revealing={revealing}
+        onAnimationEnd={(event) => {
+          if (event.target === event.currentTarget) {
+            setRevealing(false);
+          }
+        }}
+      >
+        <ul className={styles.items} aria-label={title}>
+          {orderedItems.map((item) => {
+            const amount = amountOn(data, item, day, now);
+            return (
+              <ItemTile
+                key={item.id}
+                item={item}
+                amount={item.completion === 'time' ? Math.floor(amount) : amount}
+                goal={goalOn(item, day) ?? undefined}
+                done={isDoneOn(data, item, day, now)}
+                celebrate={!reducedMotion && celebrating.includes(item.id)}
+                running={data.run?.itemId === item.id}
+                onTap={() => dispatch({ type: 'tapItem', itemId: item.id })}
+              />
+            );
+          })}
+        </ul>
       </div>
       {onNew ? (
         <ItemDrawer
           open={newItemOpen || listOpen}
           kind={kind}
-          groups={data.groups}
           items={items}
           start={listOpen ? { kind: 'list' } : { kind: 'form' }}
           triggerElement={

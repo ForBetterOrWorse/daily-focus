@@ -160,7 +160,7 @@ describe('useSaveOffer', () => {
         item: {
           kind: 'habit',
           name: 'Read',
-          groupId: null,
+
           completion: 'time',
           target: 30,
           timerStyle: 'sessions',

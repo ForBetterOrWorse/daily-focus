@@ -32,15 +32,15 @@ function seed(patch: (data: AppData) => Partial<AppData> = () => ({})) {
   const builder = createStore({ storage: window.localStorage, now: () => NOW });
   builder.dispatch({
     type: 'addItem',
-    item: { kind: 'habit', name: 'Read', groupId: null, completion: 'time', target: 30 },
+    item: { kind: 'habit', name: 'Read', completion: 'time', target: 30 },
   });
   builder.dispatch({
     type: 'addItem',
-    item: { kind: 'habit', name: 'Stretch', groupId: null, completion: 'check' },
+    item: { kind: 'habit', name: 'Stretch', completion: 'check' },
   });
   builder.dispatch({
     type: 'addItem',
-    item: { kind: 'task', name: 'Write report', groupId: null, completion: 'check' },
+    item: { kind: 'task', name: 'Write report', completion: 'check' },
   });
   builder.dispatch({ type: 'newQuickSession', start: false, name: '' });
   const data = builder.getState().data;

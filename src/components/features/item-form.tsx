@@ -5,7 +5,6 @@ import { ExclamationTriangleIcon } from '@/components/base/icon';
 import { Field } from '@/components/base/field/field';
 import { PillGroup } from '@/components/base/pill-group/pill-group';
 import { RadioGroup } from '@/components/base/radio-group/radio-group';
-import { Select } from '@/components/base/select/select';
 import { Stack } from '@/components/base/stack/stack';
 import { TextInput } from '@/components/base/text-input/text-input';
 import {
@@ -16,7 +15,7 @@ import {
   minGoal,
   type ItemInput,
 } from '@/domain/items';
-import type { Group, Item, TimerStyle } from '@/domain/types';
+import type { Item, TimerStyle } from '@/domain/types';
 import { Fold } from './fold';
 import styles from './item-drawer.module.css';
 
@@ -52,7 +51,6 @@ interface FormErrors {
 
 export interface ItemFormProps {
   kind: 'habit' | 'task';
-  groups: Group[];
   item?: Item;
   today?: number;
   nameInput?: RefObject<HTMLInputElement | null>;
@@ -62,7 +60,6 @@ export interface ItemFormProps {
 
 export function ItemForm({
   kind,
-  groups,
   item,
   today,
   nameInput,
@@ -70,7 +67,6 @@ export function ItemForm({
   onCancel,
 }: ItemFormProps) {
   const [name, setName] = useState(item?.name ?? '');
-  const [groupId, setGroupId] = useState(item ? (item.groupId ?? '') : '');
   const [completion, setCompletion] = useState<'check' | 'count' | 'time'>(
     item?.completion ?? 'check'
   );
@@ -118,8 +114,8 @@ export function ItemForm({
 
     const common =
       kind === 'habit'
-        ? { name: trimmed, groupId: groupId || null, kind, days }
-        : { name: trimmed, groupId: groupId || null, kind };
+        ? { name: trimmed, kind, days }
+        : { name: trimmed, kind };
     const input: ItemInput =
       completion === 'check'
         ? { ...common, completion }
@@ -129,10 +125,6 @@ export function ItemForm({
     onSave(input, canFixToday ? fixedToday : undefined);
   }
 
-  const groupOptions = [
-    { value: '', label: 'No group' },
-    ...groups.map((group) => ({ value: group.id, label: group.name })),
-  ];
   const submitLabel = item ? 'Save changes' : kind === 'habit' ? 'Add habit' : 'Add task';
 
   return (
@@ -149,9 +141,6 @@ export function ItemForm({
                 setErrors((previous) => ({ ...previous, name: undefined }));
               }}
             />
-          </Field>
-          <Field label="Group">
-            <Select options={groupOptions} value={groupId} onValueChange={setGroupId} />
           </Field>
           <RadioGroup
             legend="How is it done?"
