@@ -38,6 +38,7 @@
     scale var(--motion-exit),
     opacity var(--motion-exit);
 }
+
 .pair:nth-child(2) {
   --pair-order: 1;
 }

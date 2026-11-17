@@ -36,6 +36,16 @@
   transition: translate var(--motion-spatial-base);
 }
 
+.run {
+  inline-size: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  animation: swap-in var(--motion-spatial-base);
+  transition: translate var(--motion-spatial-base);
+}
+
 /*
  * Free run has no session row. The timer and the controls each move half the row's space toward
  * the middle of the card, so the leftover space splits evenly above and below.
@@ -102,16 +112,6 @@
 
 .clock[data-paused] {
   color: var(--color-fg-secondary);
-}
-
-.run {
-  inline-size: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-md);
-  animation: swap-in var(--motion-spatial-base);
-  transition: translate var(--motion-spatial-base);
 }
 
 .run-heading {
@@ -212,10 +212,6 @@
   min-block-size: 3rem;
 }
 
-:root[data-expressive] .style-pills .style-pill:has(input:not(:checked)) {
-  --pill-face: color-mix(in oklab, var(--color-fg-primary) 14%, transparent);
-}
-
 :root[data-expressive] .style-pills .style-pill {
   --pill-pad: var(--space-md);
 
@@ -230,6 +226,10 @@
     padding-inline var(--motion-spatial-fast),
     min-block-size var(--motion-spatial-fast),
     font-size var(--motion-spatial-fast);
+}
+
+:root[data-expressive] .style-pills .style-pill:has(input:not(:checked)) {
+  --pill-face: color-mix(in oklab, var(--color-fg-primary) 14%, transparent);
 }
 
 :root[data-expressive] .style-pills .style-pill:has(input:checked) {
