@@ -100,22 +100,27 @@
   max-inline-size: 100%;
 }
 
-/* The list grows from zero height while its tiles slide down from the top edge, so the section
-   below is pushed down with them. Overflow clips only while it runs. */
+/* The expanding space keeps the following section in flow while the tiles appear. */
 .reveal[data-revealing='true'] {
-  overflow: hidden;
-  animation: reveal-grow var(--reveal-motion);
+  clip-path: inset(0 -0.5rem -0.5rem);
+  animation: reveal-grow var(--motion-spatial-fast);
 }
 
 @keyframes reveal-grow {
-  from {
+  0% {
     grid-template-rows: 0fr;
+  }
+
+  45%,
+  100% {
+    grid-template-rows: 1fr;
   }
 }
 
-@keyframes reveal-slide {
+@keyframes reveal-spring {
   from {
-    translate: 0 -100%;
+    opacity: 0;
+    transform: translateY(-1rem) scale(0.8);
   }
 }
 
@@ -127,6 +132,7 @@
 
 .items {
   min-block-size: 0;
+  align-self: start;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
@@ -139,8 +145,23 @@
   flex: 0 0 6.75rem;
 }
 
-.reveal[data-revealing='true'] .items {
-  animation: reveal-slide var(--reveal-motion);
+.reveal[data-revealing='true'] .items > li {
+  animation: reveal-spring var(--motion-spatial-fast);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-expressive] .reveal[data-revealing='true'],
+  :root[data-expressive] .reveal[data-revealing='true'] .items > li {
+    animation-duration: 450ms;
+  }
+
+  :root[data-expressive] .reveal[data-revealing='true'] {
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  :root[data-expressive] .reveal[data-revealing='true'] .items > li {
+    animation-timing-function: cubic-bezier(0.42, 2.1, 0.21, 0.9);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -148,7 +169,7 @@
     animation: reveal-fade var(--transition-fast);
   }
 
-  .reveal[data-revealing='true'] .items {
+  .reveal[data-revealing='true'] .items > li {
     animation: none;
   }
 
@@ -167,4 +188,9 @@
   .actions-fold[data-open='true'] {
     transition-timing-function: step-start, ease-out, step-start;
   }
+}
+
+/* The picker must leave the layout before the tiles begin their top-down reveal. */
+.preset-fold[data-open='false'] {
+  transition: none;
 }
