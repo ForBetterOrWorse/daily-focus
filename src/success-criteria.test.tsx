@@ -535,16 +535,22 @@ describe('success criteria', () => {
     expect(merged.items.filter((item) => item.name === 'Shared')).toHaveLength(1);
   });
 
-  it('should show two quick sessions with the same name as two rows in Stats', async () => {
+  it('should show standalone sessions separately from tasks and habits in Stats', async () => {
     const { store } = launchApp({ path: '/stats' });
-    dispatch(store, { type: 'newQuickSession', start: true, name: 'Focus' });
+    dispatch(store, { type: 'newQuickSession', start: true });
     advance(12 * MINUTE);
-    dispatch(store, { type: 'newQuickSession', start: true, name: 'Focus' });
+    dispatch(store, { type: 'newQuickSession', start: true });
     advance(12 * MINUTE);
     dispatch(store, { type: 'pause' });
 
-    const table = screen.getByRole('table', { name: 'By task and habit' });
-    expect(within(table).getAllByRole('rowheader', { name: /^Focus/ })).toHaveLength(2);
+    expect(
+      screen.queryByText('No task or habit time tracked in this range.')
+    ).toBeInTheDocument();
+    const standalone = screen.getByRole('table', { name: 'Standalone sessions' });
+    expect(within(standalone).getAllByRole('rowheader')).toHaveLength(2);
+    expect(within(standalone).getByRole('rowheader', { name: 'Session 1' })).toBeVisible();
+    expect(within(standalone).getByRole('rowheader', { name: 'Session 2' })).toBeVisible();
+    expect(screen.getByText('No task or habit time tracked in this range.')).toBeVisible();
     expectCell('November 18', 2, 2);
   });
 

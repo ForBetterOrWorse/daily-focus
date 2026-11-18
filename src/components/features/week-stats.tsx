@@ -29,6 +29,7 @@ interface BarRow {
 interface BarTableProps {
   title: string;
   column: string;
+  emptyMessage: string;
   rows: BarRow[];
 }
 
@@ -40,7 +41,7 @@ function rangeLabel(start: DayKey): string {
   return `${formatDay(start)} to ${formatDay(addDays(start, 6))}`;
 }
 
-function BarTable({ title, column, rows }: BarTableProps) {
+function BarTable({ title, column, emptyMessage, rows }: BarTableProps) {
   const max = Math.max(...rows.map((row) => row.ms), 1);
   const id = `${title.toLowerCase().replace(/\s+/g, '-')}-heading`;
 
@@ -50,7 +51,7 @@ function BarTable({ title, column, rows }: BarTableProps) {
         {title}
       </h2>
       {rows.length === 0 ? (
-        <p className={styles['panel-empty']}>No time tracked in this range.</p>
+        <p className={styles['panel-empty']}>{emptyMessage}</p>
       ) : (
         <table className={styles.bars} aria-labelledby={id}>
           <thead className="sr-only">
@@ -158,6 +159,7 @@ export function WeekStats() {
             <BarTable
               title="By task and habit"
               column="Item"
+              emptyMessage="No task or habit time tracked in this range."
               rows={stats.byItem.map((item) => {
                 return {
                   key: item.itemId,
@@ -166,6 +168,16 @@ export function WeekStats() {
                   ms: item.ms,
                 };
               })}
+            />
+            <BarTable
+              title="Standalone sessions"
+              column="Session"
+              emptyMessage="No standalone sessions tracked in this range."
+              rows={stats.byStandaloneSession.map((item) => ({
+                key: item.itemId,
+                label: item.name,
+                ms: item.ms,
+              }))}
             />
           </div>
         </>

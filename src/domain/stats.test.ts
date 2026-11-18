@@ -82,6 +82,7 @@ describe('weekStats', () => {
         { itemId: 'run', name: 'Run', kind: 'habit', ms: 20 * minute },
         { itemId: 'misc', name: 'Misc', kind: 'task', ms: 5 * minute },
       ],
+      byStandaloneSession: [],
     });
   });
 
@@ -100,19 +101,21 @@ describe('weekStats', () => {
     expect(stats.byItem).toHaveLength(1);
   });
 
-  it('should list two quick sessions with the same name as two rows', () => {
+  it('should exclude quick sessions from the task and habit breakdown', () => {
     const data = dataWith(
       [
-        quick({ id: 'q1', name: 'Email', number: 1 }),
-        quick({ id: 'q2', name: 'Email', number: 2 }),
+        quick({ id: 'q1', number: 1 }),
+        quick({ id: 'q2', number: 2 }),
       ],
       [session('q1', '2024-01-02', 10), session('q2', '2024-01-03', 20)]
     );
     const stats = weekStats(data, weekStart);
 
-    expect(stats.byItem.map(({ itemId, name, ms }) => ({ itemId, name, ms }))).toEqual([
-      { itemId: 'q2', name: 'Email', ms: 20 * minute },
-      { itemId: 'q1', name: 'Email', ms: 10 * minute },
+    expect(stats.totalMs).toBe(30 * minute);
+    expect(stats.byItem).toEqual([]);
+    expect(stats.byStandaloneSession).toEqual([
+      { itemId: 'q2', name: 'Session 2', kind: 'quick', ms: 20 * minute },
+      { itemId: 'q1', name: 'Session 1', kind: 'quick', ms: 10 * minute },
     ]);
   });
 
@@ -127,13 +130,14 @@ describe('weekStats', () => {
     expect(stats.byItem).toEqual([
       { itemId: 'q1', name: 'Email', kind: 'task', ms: 10 * minute },
     ]);
+    expect(stats.byStandaloneSession).toEqual([]);
   });
 
-  it('should total quick session time by item', () => {
+  it('should include standalone sessions in the total and their own breakdown', () => {
     const data = dataWith(
       [
         quick({ id: 'q1', name: 'A' }),
-        quick({ id: 'q2', name: 'B' }),
+        quick({ id: 'q2', name: 'B', timerStyle: 'sessions' }),
         task({ id: 'misc', name: 'Misc' }),
       ],
       [
@@ -143,11 +147,14 @@ describe('weekStats', () => {
       ]
     );
 
-    expect(weekStats(data, weekStart).byItem.map(({ ms }) => ms)).toEqual([
-      20 * minute,
-      10 * minute,
-      5 * minute,
-    ]);
+    expect(weekStats(data, weekStart)).toEqual({
+      totalMs: 35 * minute,
+      byItem: [{ itemId: 'misc', name: 'Misc', kind: 'task', ms: 5 * minute }],
+      byStandaloneSession: [
+        { itemId: 'q2', name: 'B', kind: 'quick', ms: 20 * minute },
+        { itemId: 'q1', name: 'A', kind: 'quick', ms: 10 * minute },
+      ],
+    });
   });
 
   it('should sort by time, largest first, then by name', () => {
@@ -175,6 +182,7 @@ describe('weekStats', () => {
     expect(weekStats(dataWith([task()], []), weekStart)).toEqual({
       totalMs: 0,
       byItem: [],
+      byStandaloneSession: [],
     });
   });
 });

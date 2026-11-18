@@ -123,7 +123,8 @@ describe('WeekStats', () => {
       within(screen.getByRole('group', { name: 'Week' })).getByText('Oct 12 to Oct 18')
     ).toBeVisible();
     expect(screen.queryByRole('table', { name: 'By task and habit' })).not.toBeInTheDocument();
-    expect(screen.getByText('No time tracked in this range.')).toBeVisible();
+    expect(screen.getByText('No task or habit time tracked in this range.')).toBeVisible();
+    expect(screen.getByText('No standalone sessions tracked in this range.')).toBeVisible();
   });
 
   it('should render a table with header cells and item rows', () => {
@@ -134,4 +135,5 @@ describe('WeekStats', () => {
     expect(within(byItem).getAllByRole('columnheader', { hidden: true })).toHaveLength(2);
     expect(within(byItem).getByRole('rowheader', { name: /Read/ })).toHaveTextContent('Habit');
   });
+
 });
