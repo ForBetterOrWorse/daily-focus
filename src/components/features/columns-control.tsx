@@ -1,6 +1,9 @@
 import { Button } from '@/components/base/button/button';
+import { Tooltip } from '@/components/base/tooltip/tooltip';
 import { ColumnsLayoutIcon, PlusLgIcon } from './app-icons';
 import styles from './columns-control.module.css';
+
+const TOGGLE_SHORTCUT = ['\\'];
 
 interface ColumnsControlProps {
   variant: 'invite' | 'toggle';
@@ -30,23 +33,25 @@ export function ColumnsControl({ variant, open, controlsId, onToggle }: ColumnsC
   const invite = variant === 'invite';
 
   return (
-    <Button
-      variant="primary"
-      icon={ColumnsControlIcon}
-      className={styles['columns-control']}
-      data-variant={variant}
-      aria-keyshortcuts={invite ? undefined : '\\'}
-      title={
-        invite ? undefined : open ? 'Hide habits and tasks (\\)' : 'Show habits and tasks (\\)'
-      }
-      aria-expanded={open}
-      aria-controls={controlsId}
-      onClick={onToggle}
+    <Tooltip
+      label={invite ? '' : open ? 'Hide habits and tasks' : 'Show habits and tasks'}
+      shortcut={invite ? undefined : TOGGLE_SHORTCUT}
     >
-      <span className={styles['columns-label']} aria-hidden={invite ? undefined : true}>
-        <span className={styles['columns-label-text']}>Add habits and tasks</span>
-      </span>
-      {invite ? null : <span className="sr-only">Habits and tasks</span>}
-    </Button>
+      <Button
+        variant="primary"
+        icon={ColumnsControlIcon}
+        className={styles['columns-control']}
+        data-variant={variant}
+        aria-keyshortcuts={invite ? undefined : '\\'}
+        aria-expanded={open}
+        aria-controls={controlsId}
+        onClick={onToggle}
+      >
+        <span className={styles['columns-label']} aria-hidden={invite ? undefined : true}>
+          <span className={styles['columns-label-text']}>Add habits and tasks</span>
+        </span>
+        {invite ? null : <span className="sr-only">Habits and tasks</span>}
+      </Button>
+    </Tooltip>
   );
 }

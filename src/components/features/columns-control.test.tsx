@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ColumnsControl } from './columns-control';
@@ -22,18 +22,37 @@ describe('ColumnsControl', () => {
     expect(onToggle).toHaveBeenCalledOnce();
   });
 
-  it('should follow open in aria-expanded and title', () => {
+  it('should follow open in aria-expanded without using the native title tooltip', () => {
     const { rerender } = render(
       <ColumnsControl variant="toggle" open={false} controlsId="cols" onToggle={vi.fn()} />
     );
     const toggle = screen.getByRole('button', { name: 'Habits and tasks' });
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    expect(toggle).toHaveAttribute('title', 'Show habits and tasks (\\)');
+    expect(toggle).not.toHaveAttribute('title');
 
     rerender(<ColumnsControl variant="toggle" open controlsId="cols" onToggle={vi.fn()} />);
 
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    expect(toggle).toHaveAttribute('title', 'Hide habits and tasks (\\)');
+    expect(toggle).not.toHaveAttribute('title');
+  });
+
+  it('should describe the icon-only toggle with its current action', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <ColumnsControl variant="toggle" open={false} controlsId="cols" onToggle={vi.fn()} />
+    );
+
+    const toggle = screen.getByRole('button', { name: 'Habits and tasks' });
+    await user.tab();
+    expect(toggle).toHaveAccessibleDescription('Show habits and tasks');
+    const tooltip = screen.getByRole('tooltip', { hidden: true });
+    expect(tooltip).toHaveTextContent('Show habits and tasks');
+    expect(within(tooltip).getByText('\\', { selector: 'kbd' })).toBeInTheDocument();
+
+    rerender(<ColumnsControl variant="toggle" open controlsId="cols" onToggle={vi.fn()} />);
+
+    expect(toggle).toHaveAccessibleDescription('Hide habits and tasks');
+    expect(within(tooltip).getByText('\\', { selector: 'kbd' })).toBeInTheDocument();
   });
 
   it('should expose the controlled region and the shortcut on the toggle', () => {
