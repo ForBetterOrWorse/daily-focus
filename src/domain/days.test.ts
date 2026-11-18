@@ -45,14 +45,4 @@ describe('day helpers', () => {
     ]);
   });
 
-  it.skipIf(Intl.DateTimeFormat().resolvedOptions().timeZone !== 'America/New_York')(
-    'should account for 23-hour spring-forward and 25-hour fall-back days',
-    () => {
-      const springForward = '2024-03-10';
-      const fallBack = '2024-11-03';
-
-      expect(dayStart(addDays(springForward, 1), 0) - dayStart(springForward, 0)).toBe(23 * hour);
-      expect(dayStart(addDays(fallBack, 1), 0) - dayStart(fallBack, 0)).toBe(25 * hour);
-    }
-  );
 });

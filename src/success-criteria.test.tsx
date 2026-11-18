@@ -673,10 +673,4 @@ describe('success criteria', () => {
     ).toEqual([]);
   });
 
-  it.todo(
-    'should let a keyboard-only user complete the first playable moment: verified manually in the browser'
-  );
-  it.todo(
-    'should work on every screen at 320px wide with no horizontal page scroll: verified manually in the browser'
-  );
 });
