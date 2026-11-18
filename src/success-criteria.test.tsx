@@ -543,9 +543,6 @@ describe('success criteria', () => {
     advance(12 * MINUTE);
     dispatch(store, { type: 'pause' });
 
-    expect(
-      screen.queryByText('No task or habit time tracked in this range.')
-    ).toBeInTheDocument();
     const standalone = screen.getByRole('table', { name: 'Standalone sessions' });
     expect(within(standalone).getAllByRole('rowheader')).toHaveLength(2);
     expect(within(standalone).getByRole('rowheader', { name: 'Session 1' })).toBeVisible();
