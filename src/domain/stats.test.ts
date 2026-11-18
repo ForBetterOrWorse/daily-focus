@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { emptyData } from './schema';
-import { reduce } from './reduce';
 import { weekStats } from './stats';
 import type { AppData, HabitItem, Item, QuickItem, Session, TaskItem } from './types';
 
@@ -117,20 +116,6 @@ describe('weekStats', () => {
       { itemId: 'q2', name: 'Session 2', kind: 'quick', ms: 20 * minute },
       { itemId: 'q1', name: 'Session 1', kind: 'quick', ms: 10 * minute },
     ]);
-  });
-
-  it('should show a session saved as a task only under the task', () => {
-    const before = dataWith(
-      [quick({ id: 'q1', name: 'Email' })],
-      [session('q1', '2024-01-02', 10)]
-    );
-    const saved = reduce(before, { type: 'saveQuickAsTask', itemId: 'q1' }, now);
-    const stats = weekStats(saved, weekStart);
-
-    expect(stats.byItem).toEqual([
-      { itemId: 'q1', name: 'Email', kind: 'task', ms: 10 * minute },
-    ]);
-    expect(stats.byStandaloneSession).toEqual([]);
   });
 
   it('should include standalone sessions in the total and their own breakdown', () => {

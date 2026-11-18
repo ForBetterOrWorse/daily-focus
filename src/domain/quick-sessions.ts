@@ -1,7 +1,6 @@
 import { dayKeyOf } from './days';
-import { displayName } from './items';
 import { pauseRun, restartClock, startItem } from './clock';
-import type { AppData, QuickItem, TaskItem, TimerStyle } from './types';
+import type { AppData, QuickItem, TimerStyle } from './types';
 
 export function nextQuickNumber(data: AppData, day: string): number {
   const last = data.meta.lastQuickNumber;
@@ -68,30 +67,4 @@ export function setQuickStyle(
     meta: { ...data.meta, quickStyle: style },
   };
   return style === quick.timerStyle ? changed : restartClock(changed, itemId, now);
-}
-
-export function saveQuickAsTask(data: AppData, itemId: string, now: number): AppData {
-  const quick = findQuick(data, itemId);
-  const pinned = data.cardItemId === itemId;
-  const paused = !pinned && data.run?.itemId === itemId ? pauseRun(data, now) : data;
-  const task: TaskItem = {
-    id: quick.id,
-    kind: 'task',
-    name: displayName(quick),
-    completion: 'time',
-    goals: [{ from: dayKeyOf(now, data.settings.dayStartHour), target: 30 }],
-    timerStyle: quick.timerStyle,
-    createdAt: quick.createdAt,
-    updatedAt: now,
-  };
-  const clocks = { ...paused.clocks };
-  if (!pinned) {
-    delete clocks[itemId];
-  }
-  return {
-    ...paused,
-    items: paused.items.map((item) => (item.id === itemId ? task : item)),
-    order: { ...paused.order, tasks: [...paused.order.tasks, itemId] },
-    clocks,
-  };
 }

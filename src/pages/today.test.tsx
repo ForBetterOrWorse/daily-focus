@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ToastProvider } from '@/components/base/toast/toast';
@@ -313,15 +313,5 @@ describe('Today', () => {
       expect(screen.queryByRole('heading', { name: 'Habits' })).not.toBeInTheDocument();
     });
 
-    it('should leave the columns preference alone when a quick session is saved as a task', () => {
-      const store = setup();
-      store.dispatch({ type: 'newQuickSession', start: false, name: 'Quick work' });
-      const quick = store.getState().data.items[0];
-      renderToday(store);
-
-      act(() => store.dispatch({ type: 'saveQuickAsTask', itemId: quick.id }));
-
-      expect(store.getState().data.meta.columnsOpen).toBeNull();
-    });
   });
 });

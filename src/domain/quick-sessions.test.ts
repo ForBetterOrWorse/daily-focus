@@ -55,20 +55,18 @@ function createQuick(
 }
 
 describe('quick session actions', () => {
-  it('should number new sessions in sequence and keep numbering after a save', () => {
+  it('should number new sessions in sequence and reset numbering each day', () => {
     let data = emptyData(now);
     expect(data.meta.lastQuickNumber).toBeNull();
 
     [data] = createQuick(data, false, now, 'First');
-    const first = data.items.find((item) => item.kind === 'quick');
+    const firstItems = data.items.filter((item) => item.kind === 'quick');
+    const first = firstItems[firstItems.length - 1];
     expect(first?.number).toBe(1);
-    if (!first) {
-      throw new Error('Expected the first quick session');
-    }
-    data = reduce(data, { type: 'saveQuickAsTask', itemId: first.id }, now);
 
     [data] = createQuick(data, false, now + minute);
-    const second = data.items.find((item) => item.kind === 'quick');
+    const secondItems = data.items.filter((item) => item.kind === 'quick');
+    const second = secondItems[secondItems.length - 1];
     expect(second?.number).toBe(2);
     [data] = createQuick(data, false, now + 2 * minute);
     const sameDayItems = data.items.filter((item) => item.kind === 'quick');
@@ -180,49 +178,6 @@ describe('quick session actions', () => {
       phase: 'focus',
       round: 1,
       elapsedMs: 0,
-    });
-  });
-
-  it('should save a pinned quick session as a task with the same id, time, and clock', () => {
-    let data = reduce(
-      emptyData(now),
-      { type: 'newQuickSession', start: true, name: 'Writing' },
-      now
-    );
-    const quickId = data.run!.itemId;
-    data = reduce(data, { type: 'pause' }, now + 12 * minute);
-    const sessions = data.sessions;
-    const clock = data.clocks[quickId];
-    expect(sessions).toHaveLength(1);
-    expect(sessions[0]).toMatchObject({ itemId: quickId, durationMs: 12 * minute });
-
-    data = reduce(data, { type: 'saveQuickAsTask', itemId: quickId }, now + 13 * minute);
-    const saved = data.items.find((item) => item.id === quickId);
-
-    expect(saved).toMatchObject({
-      id: quickId,
-      kind: 'task',
-      name: 'Writing',
-      completion: 'time',
-      goals: [{ from: today, target: 30 }],
-      timerStyle: 'free',
-      updatedAt: now + 13 * minute,
-    });
-    expect(data.items.some((item) => item.kind === 'quick')).toBe(false);
-    expect(data.sessions).toEqual(sessions);
-    expect(data.clocks[quickId]).toEqual(clock);
-    expect(data.cardItemId).toBe(quickId);
-    expect(data.order.tasks).toContain(quickId);
-  });
-
-  it('should save an unnamed quick session as a task under its default name', () => {
-    const [data, quick] = createQuick();
-
-    const saved = reduce(data, { type: 'saveQuickAsTask', itemId: quick.id }, now);
-
-    expect(saved.items.find((item) => item.id === quick.id)).toMatchObject({
-      kind: 'task',
-      name: `Session ${quick.number}`,
     });
   });
 

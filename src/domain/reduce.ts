@@ -15,7 +15,7 @@ import {
 import { mergeData, replaceData } from './backup';
 import { setColumnsOpen } from './layout';
 import { updateSettings, type SettingsPatch } from './settings';
-import { newQuickSession, renameQuick, saveQuickAsTask, setQuickStyle } from './quick-sessions';
+import { newQuickSession, renameQuick, setQuickStyle } from './quick-sessions';
 
 export type Action =
   | { type: 'restore'; snapshot: AppData }
@@ -34,7 +34,6 @@ export type Action =
   | { type: 'newQuickSession'; start: boolean; name?: string }
   | { type: 'renameQuick'; itemId: string; name: string }
   | { type: 'setQuickStyle'; itemId: string; style: TimerStyle }
-  | { type: 'saveQuickAsTask'; itemId: string }
   | { type: 'setColumnsOpen'; open: boolean }
   | { type: 'updateSettings'; patch: SettingsPatch }
   | { type: 'useSkip'; day: DayKey }
@@ -77,8 +76,6 @@ function apply(data: AppData, action: Action, now: number): AppData {
       return renameQuick(data, action.itemId, action.name, now);
     case 'setQuickStyle':
       return setQuickStyle(data, action.itemId, action.style, now);
-    case 'saveQuickAsTask':
-      return saveQuickAsTask(data, action.itemId, now);
     case 'updateSettings':
       return updateSettings(data, action.patch, now);
     case 'useSkip':

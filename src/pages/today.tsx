@@ -16,7 +16,6 @@ import { ColumnsControl } from '@/components/features/columns-control';
 import { FocusCard } from '@/components/features/focus-card';
 import { ItemSection } from '@/components/features/item-section';
 import { Streak } from '@/components/features/streak';
-import { useSaveOffer } from '@/hooks/use-save-offer';
 import { useSeoMeta } from '@/hooks/use-seo-meta';
 import { useAppData, useDispatch, useNow } from '@/store/use-app-data';
 import { seoConfig } from '@/utils/seo.config';
@@ -56,7 +55,6 @@ export function Today() {
   const shown = columnsShown(data);
   const invited = data.meta.columnsOpen === null;
   const { weekday, monthDay } = dateParts(day);
-  useSaveOffer();
   useSeoMeta({ title: `Today | ${seoConfig.siteTitle}`, path: '/' });
   useShortcut({ key: 'e', shift: true }, (event) => {
     event.preventDefault();

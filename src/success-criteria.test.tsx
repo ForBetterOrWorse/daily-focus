@@ -277,19 +277,19 @@ describe('success criteria', () => {
       expectCell('November 18', 2, 2);
     });
 
-    it('should save a named quick session as a task that holds its tracked time', async () => {
+    it('should keep a paused named quick session standalone without offering to add it to tasks', async () => {
       const { user, store, storage } = launchApp();
 
       await user.click(screen.getByRole('button', { name: 'Start' }));
       await user.type(screen.getByRole('textbox', { name: 'Session name' }), 'Sketch ideas');
       advance(3 * MINUTE);
       await user.click(screen.getByRole('button', { name: 'Pause' }));
-      await user.click(screen.getByRole('button', { name: 'Add to tasks' }));
 
-      const task = itemNamed(store, 'Sketch ideas');
-      expect(task.kind).toBe('task');
-      expect(trackedMs(savedData(storage), task.id)).toBe(3 * MINUTE);
-      expect(screen.getByRole('button', { name: /^Sketch ideas/ })).toBeInTheDocument();
+      const session = itemNamed(store, 'Sketch ideas');
+      expect(session.kind).toBe('quick');
+      expect(trackedMs(savedData(storage), session.id)).toBe(3 * MINUTE);
+      expect(screen.queryByRole('button', { name: 'Add to tasks' })).not.toBeInTheDocument();
+      expect(screen.getByRole('textbox', { name: 'Session name' })).toHaveValue('Sketch ideas');
     });
   });
 
