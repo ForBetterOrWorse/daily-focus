@@ -8,10 +8,12 @@
 const LAP_SECONDS = 20;
 const SPEED_SWING = 0.5;
 const HEAD_RESPONSE_SECONDS = 0.3;
-const SETTLE_FREQUENCY = 3;
+const SETTLE_FREQUENCY = 3.3;
 const SETTLE_DAMPING_RATIO = 0.6;
 const TAIL_LAG_SECONDS = 1.5;
 const TAIL_DAMPING_RATIO = 0.7;
+const PAUSED_STRETCHED_FREQUENCY_FACTOR = 0.9;
+const PAUSED_COMPRESSED_FREQUENCY_FACTOR = 1.4;
 const MIN_LENGTH = 2;
 const MAX_LENGTH = 30;
 const PROFILE_SAMPLES = 360;
@@ -134,8 +136,14 @@ export function stepOrbit(
   }
   head += velocity * seconds;
 
-  const pull = TAIL_FREQUENCY ** 2 * (head - ORBIT_REST_LENGTH - tail);
-  const drag = 2 * TAIL_DAMPING_RATIO * TAIL_FREQUENCY * tailVelocity;
+  const tailFrequency = running
+    ? TAIL_FREQUENCY
+    : TAIL_FREQUENCY *
+      (head - tail > ORBIT_REST_LENGTH
+        ? PAUSED_STRETCHED_FREQUENCY_FACTOR
+        : PAUSED_COMPRESSED_FREQUENCY_FACTOR);
+  const pull = tailFrequency ** 2 * (head - ORBIT_REST_LENGTH - tail);
+  const drag = 2 * TAIL_DAMPING_RATIO * tailFrequency * tailVelocity;
   tailVelocity += (pull - drag) * seconds;
   tail += tailVelocity * seconds;
   tail = head - Math.min(Math.max(head - tail, MIN_LENGTH), MAX_LENGTH);

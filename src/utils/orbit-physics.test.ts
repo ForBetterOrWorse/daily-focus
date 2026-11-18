@@ -89,6 +89,18 @@ describe('stepOrbit while running', () => {
 describe('stepOrbit when paused', () => {
   const profile = buildOrbitProfile(squircle.path);
 
+  it('should drop toward the bottom promptly when paused', () => {
+    const start = {
+      ...restingOrbit(profile),
+      head: profile.bottom - 20,
+      tail: profile.bottom - 20 - ORBIT_REST_LENGTH,
+    };
+    const paused = simulate(profile, start, 0.5, false);
+
+    expect(profile.bottom - paused.head).toBeGreaterThan(5);
+    expect(profile.bottom - paused.head).toBeLessThan(7.3);
+  });
+
   it('should roll to the bottom and settle with the arc back at its resting length', () => {
     const running = simulate(profile, restingOrbit(profile), 13, true);
     const settled = simulate(profile, running, 15, false);
@@ -102,6 +114,24 @@ describe('stepOrbit when paused', () => {
     const running = simulate(profile, restingOrbit(profile), 13, true);
 
     expect(isOrbitResting(stepOrbit(running, FRAME, false, profile))).toBe(false);
+  });
+
+  it('should shrink a stretched trail gradually while paused', () => {
+    const start = { ...restingOrbit(profile), tail: profile.bottom - 10 };
+    const paused = simulate(profile, start, 1, false);
+
+    expect(paused.head - paused.tail).toBeGreaterThan(8.7);
+    expect(paused.head - paused.tail).toBeLessThan(9);
+    expect(isOrbitResting(simulate(profile, paused, 15, false))).toBe(true);
+  });
+
+  it('should expand a compressed trail promptly while paused', () => {
+    const start = { ...restingOrbit(profile), tail: profile.bottom - 2.5 };
+    const paused = simulate(profile, start, 1, false);
+
+    expect(paused.head - paused.tail).toBeGreaterThan(3.55);
+    expect(paused.head - paused.tail).toBeLessThan(3.9);
+    expect(isOrbitResting(simulate(profile, paused, 15, false))).toBe(true);
   });
 });
 
