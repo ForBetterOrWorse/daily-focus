@@ -8,6 +8,7 @@
   --dial-tint: var(--color-current-item-bg);
   --hero-size: 4.5rem;
   --hero-radius-paused: 20px;
+  --card-radius: 20px;
   --clock-size: 3.5rem;
   --trace-step: 1s linear;
   --session-row-block: 2.25rem;
@@ -20,7 +21,7 @@
   gap: var(--space-lg);
   padding-block: var(--space-lg);
   padding-inline: var(--space-md);
-  border-radius: var(--radius);
+  border-radius: var(--card-radius);
   background-color: var(--color-current-item-bg);
   color: var(--color-fg-primary);
   text-align: center;

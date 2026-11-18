@@ -76,7 +76,6 @@ function BarTable({ title, column, emptyMessage, rows }: BarTableProps) {
                       height="100%"
                       rx="4"
                     />
-                    <rect className={styles.bar} width="8" height="100%" />
                   </svg>
                 </td>
               </tr>
