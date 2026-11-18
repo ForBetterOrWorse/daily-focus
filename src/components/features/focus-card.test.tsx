@@ -85,6 +85,18 @@ describe('FocusCard', () => {
     expect(screen.getByRole('button', { name: 'Start' })).toBeVisible();
   });
 
+  it('should show hours in a free run only after the first hour', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    setup(timeItem('Read', 'free'));
+
+    await user.click(screen.getByRole('button', { name: 'Start' }));
+    advance(59 * MINUTE + 59_000);
+    expect(screen.getByText('59:59')).toBeVisible();
+
+    advance(1000);
+    expect(screen.getByText('1:00:00')).toBeVisible();
+  });
+
   it('should start and pause from the hero and announce each change without the seconds', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     setup(timeItem('Read'));

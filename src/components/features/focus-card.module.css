@@ -8,11 +8,10 @@
   --dial-tint: var(--color-current-item-bg);
   --hero-size: 4.5rem;
   --hero-radius-paused: 20px;
-  --clock-size: 4rem;
-  --clock-size-long: 3rem;
+  --clock-size: 3.5rem;
   --trace-step: 1s linear;
   --session-row-block: 2.25rem;
-  --compact-shift: calc((var(--session-row-block) + var(--space-md)) / 2);
+  --dial-grow: calc(var(--session-row-block) + var(--space-md));
 
   position: relative;
   display: flex;
@@ -32,7 +31,10 @@
   inline-size: min(var(--dial-size), 100%);
   aspect-ratio: 1;
   flex: none;
-  transition: translate var(--motion-spatial-base);
+  container-type: inline-size;
+  transition:
+    inline-size var(--motion-spatial-base),
+    margin-block var(--motion-spatial-base);
 }
 
 .run {
@@ -41,19 +43,22 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-md);
-  transition: translate var(--motion-spatial-base);
 }
 
 /*
- * Free run has no session row. The timer and the controls each move half the row's space toward
- * the middle of the card, so the leftover space splits evenly above and below.
+ * Free run has no session row, so the dial grows into the row's space. The margins keep the
+ * dial's footprint as tall as it is in Focus sessions, which leaves the controls and the card
+ * height where they were. The dial cannot outgrow the card width, so on narrow cards it grows
+ * less and the space it leaves over is split above and below it.
  */
-.card[data-compact] .dial {
-  translate: 0 var(--compact-shift);
-}
+.card[data-free] .dial {
+  --dial-base: min(var(--dial-size), 100%);
+  --dial-full: min(calc(var(--dial-size) + var(--dial-grow)), 100%);
+  --dial-slack: calc(var(--dial-base) + var(--dial-grow) - var(--dial-full));
 
-.card[data-compact] .run {
-  translate: 0 calc(-1 * var(--compact-shift));
+  inline-size: var(--dial-full);
+  margin-block-start: calc(var(--dial-slack) / 2);
+  margin-block-end: calc(var(--dial-base) - var(--dial-full) - var(--dial-slack) / 2);
 }
 
 .dial-svg {
@@ -66,6 +71,15 @@
 
 .dial-fill {
   fill: var(--dial-tint);
+}
+
+.dial-trace-group {
+  animation: fade-in var(--transition-base);
+}
+
+/* The orbit is animated on its own, so a transition would only lag behind it and drift on pause. */
+.dial-trace-group[data-orbit] .dial-trace {
+  transition: none;
 }
 
 .dial-track,
@@ -104,8 +118,12 @@
   transition: color var(--transition-fast);
 }
 
-.clock[data-long] {
-  font-size: var(--clock-size-long);
+/*
+ * A free run can show eight characters (10:59:59). The cap keeps that string inside the ring on
+ * the narrowest dials, and the size stays fixed at any one dial width.
+ */
+.card[data-free] .clock {
+  font-size: min(var(--clock-size), 20cqi);
 }
 
 .clock[data-paused] {
@@ -287,6 +305,8 @@
 
 @media (min-width: 600px) {
   .card {
+    --clock-size: 4rem;
+
     padding-inline: var(--space-lg);
   }
 }
@@ -309,12 +329,15 @@
       visibility var(--transition-fast);
   }
 
-  .dial,
-  .run {
+  .dial {
     transition: none;
   }
 
   .dial-trace {
     transition: none;
+  }
+
+  .dial-trace-group {
+    animation: none;
   }
 }

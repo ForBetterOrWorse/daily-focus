@@ -34,3 +34,17 @@ Object.defineProperty(window, 'IntersectionObserver', {
     readonly thresholds: ReadonlyArray<number> = [];
   },
 });
+
+// Tests advance fake timers by minutes or hours. A frame loop would run hundreds of thousands of
+// frames over that span, so animation frames never fire. A test that needs them stubs them itself.
+Object.defineProperty(window, 'requestAnimationFrame', {
+  configurable: true,
+  writable: true,
+  value: () => 0,
+});
+
+Object.defineProperty(window, 'cancelAnimationFrame', {
+  configurable: true,
+  writable: true,
+  value: () => {},
+});

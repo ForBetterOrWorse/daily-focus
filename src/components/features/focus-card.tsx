@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { Button } from '@/components/base/button/button';
 import { CheckLgIcon } from '@/components/base/icon';
 import pillStyles from '@/components/base/pill-group/pill-group.module.css';
@@ -10,15 +10,17 @@ import { dayKeyOf } from '@/domain/days';
 import { nextQuickNumber } from '@/domain/quick-sessions';
 import { displayName, isDoneOn } from '@/domain/items';
 import type { AppData, Item, ItemClock, TimerStyle } from '@/domain/types';
+import { useOrbit } from '@/hooks/use-orbit';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { useShortcut } from '@/hooks/use-shortcut';
 import { useAppData, useDispatch } from '@/store/use-app-data';
 import { formatClock } from '@/utils/format-clock';
+import { buildOrbitProfile, orbitSegments, restingOrbit } from '@/utils/orbit-physics';
 import { ArrowCounterclockwiseIcon, PauseFillIcon, PlayFillIcon, StopwatchIcon } from './app-icons';
 import { DIAL_SIZE, pickTimerShape, traceSegments } from './focus-shapes';
 import { FocusSessions } from './focus-sessions';
 import styles from './focus-card.module.css';
 
-const FREE_TRACE_MS = 60 * 60_000;
 const QUICK_DIAL_KEY = 'quick';
 const TIMER_STYLES: { value: TimerStyle; label: string; start: string }[] = [
   { value: 'sessions', label: 'Focus sessions', start: '25:00' },
@@ -63,6 +65,7 @@ export function FocusCard({ item, now }: FocusCardProps) {
   const data = useAppData((appData) => appData);
   const dispatch = useDispatch();
   const announce = useAnnounce();
+  const reducedMotion = useReducedMotion();
   const showToast = useToast();
   const itemId = item?.id ?? null;
   const quick = item === null || item.kind === 'quick';
@@ -81,6 +84,7 @@ export function FocusCard({ item, now }: FocusCardProps) {
   const [draft, setDraft] = useState({ forId: itemId, text: quickItem?.name ?? '' });
   const pendingStyle = useRef<TimerStyle | null>(null);
   const nameInput = useRef<HTMLInputElement>(null);
+  const orbitPaths = useRef<(SVGPathElement | null)[]>([]);
   const focusName = useRef(false);
   const previousData = useRef(data);
   const nowRef = useRef(now);
@@ -181,10 +185,21 @@ export function FocusCard({ item, now }: FocusCardProps) {
 
   const sessions = clock.style === 'sessions';
   const duration = phaseDuration(clock);
-  const progress = Math.min(
-    sessions ? clock.elapsedMs / duration : (clock.elapsedMs % FREE_TRACE_MS) / FREE_TRACE_MS,
-    1
-  );
+  const started = running || clock.elapsedMs > 0;
+  const orbiting = !sessions && !reducedMotion;
+  const orbitProfile = useMemo(() => buildOrbitProfile(dial.shape.path), [dial.shape.path]);
+  useOrbit(orbitPaths, { enabled: orbiting && started, running, profile: orbitProfile });
+  const progress = Math.min(clock.elapsedMs / duration, 1);
+  const segments = sessions
+    ? progress > 0
+      ? traceSegments(progress)
+      : []
+    : !started
+      ? []
+      : reducedMotion
+        ? traceSegments(1)
+        : orbitSegments(restingOrbit(orbitProfile));
+  const traceKey = `${dialKey}-${clock.style}-${started}`;
   const clockText = formatClock(
     sessions
       ? Math.ceil(Math.max(0, duration - clock.elapsedMs) / 1000)
@@ -217,7 +232,7 @@ export function FocusCard({ item, now }: FocusCardProps) {
   }
 
   return (
-    <section aria-label="Timer" className={styles.card} data-compact={!sessions || undefined}>
+    <section aria-label="Timer" className={styles.card} data-free={!sessions || undefined}>
       {quick ? (
         <fieldset className={`${pillStyles.group} ${styles['style-pills']}`}>
           <legend className="sr-only">Timer style</legend>
@@ -256,24 +271,29 @@ export function FocusCard({ item, now }: FocusCardProps) {
         >
           <path className={styles['dial-fill']} d={dial.shape.path} />
           <path className={styles['dial-track']} d={dial.shape.path} pathLength={100} />
-          {(progress > 0 ? traceSegments(progress) : []).map((segment, index) => (
-            <path
-              key={index}
-              className={styles['dial-trace']}
-              d={dial.shape.path}
-              pathLength={100}
-              stroke={`color-mix(in oklch, var(--color-highlight-mark) ${(segment.mix * 100).toFixed(1)}%, var(--color-progress))`}
-              strokeDasharray={`${segment.length.toFixed(3)} 100`}
-              strokeDashoffset={(-segment.start).toFixed(3)}
-            />
-          ))}
+          <g
+            key={traceKey}
+            className={styles['dial-trace-group']}
+            data-orbit={orbiting || undefined}
+          >
+            {segments.map((segment, index) => (
+              <path
+                key={index}
+                className={styles['dial-trace']}
+                d={dial.shape.path}
+                pathLength={100}
+                stroke={`color-mix(in oklch, var(--color-highlight-mark) ${(segment.mix * 100).toFixed(1)}%, var(--color-progress))`}
+                strokeDasharray={`${segment.length.toFixed(3)} ${sessions ? 100 : (100 - segment.length).toFixed(3)}`}
+                strokeDashoffset={(-segment.start).toFixed(3)}
+                ref={(element) => {
+                  orbitPaths.current[index] = element;
+                }}
+              />
+            ))}
+          </g>
         </svg>
         <div className={styles['dial-center']}>
-          <span
-            className={styles.clock}
-            data-long={clockText.length > 5 || undefined}
-            data-paused={!running || undefined}
-          >
+          <span className={styles.clock} data-paused={!running || undefined}>
             {clockText}
           </span>
         </div>

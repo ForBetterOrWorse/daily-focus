@@ -1,7 +1,7 @@
 export const seoConfig = {
   // Fill these in for your project
   /** The deployed URL of your site, e.g. "https://www.my-course.com" */
-  siteUrl: undefined as string | undefined,
+  siteUrl: 'https://daily-focus.fbow.org' as string | undefined,
   /** The display name of your site, e.g. "My Course Name" */
   siteName: 'Daily Focus' as string | undefined,
   /** Used in <title> tags and the post-build SEO route generator */
