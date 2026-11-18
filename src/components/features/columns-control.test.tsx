@@ -64,13 +64,15 @@ describe('ColumnsControl', () => {
     expect(toggle).toHaveAttribute('aria-keyshortcuts', '\\');
   });
 
-  it('should expose the controlled region on the invite button', () => {
+  it('should show and expose the shortcut on the invite button', () => {
     render(<ColumnsControl variant="invite" open={false} controlsId="cols" onToggle={vi.fn()} />);
 
     const invite = screen.getByRole('button', { name: 'Add habits and tasks' });
 
     expect(invite).toHaveAttribute('aria-controls', 'cols');
     expect(invite).toHaveAttribute('aria-expanded', 'false');
+    expect(invite).toHaveAttribute('aria-keyshortcuts', '\\');
+    expect(within(invite).getByText('\\', { selector: 'kbd' })).toBeInTheDocument();
   });
 
   it('should keep the same button when the invite becomes the toggle', () => {

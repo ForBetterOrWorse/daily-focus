@@ -1,4 +1,5 @@
 import { Button } from '@/components/base/button/button';
+import { KbdCombo } from '@/components/base/kbd-combo/kbd-combo';
 import { Tooltip } from '@/components/base/tooltip/tooltip';
 import { ColumnsLayoutIcon, PlusLgIcon } from './app-icons';
 import styles from './columns-control.module.css';
@@ -42,13 +43,18 @@ export function ColumnsControl({ variant, open, controlsId, onToggle }: ColumnsC
         icon={ColumnsControlIcon}
         className={styles['columns-control']}
         data-variant={variant}
-        aria-keyshortcuts={invite ? undefined : '\\'}
+        aria-keyshortcuts={TOGGLE_SHORTCUT[0]}
         aria-expanded={open}
         aria-controls={controlsId}
         onClick={onToggle}
       >
         <span className={styles['columns-label']} aria-hidden={invite ? undefined : true}>
-          <span className={styles['columns-label-text']}>Add habits and tasks</span>
+          <span className={styles['columns-label-text']}>
+            Add habits and tasks
+            <span aria-hidden="true">
+              <KbdCombo keys={TOGGLE_SHORTCUT} minimal className={styles['columns-shortcut']} />
+            </span>
+          </span>
         </span>
         {invite ? null : <span className="sr-only">Habits and tasks</span>}
       </Button>

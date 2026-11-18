@@ -4,11 +4,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { useShortcut } from './use-shortcut';
 
 describe('useShortcut', () => {
-  it('should fire Shift+S from the page', () => {
+  it('should fire S from the page', () => {
     const handler = vi.fn();
-    renderHook(() => useShortcut({ key: 's', shift: true }, handler));
+    renderHook(() => useShortcut({ key: 's' }, handler));
 
-    fireEvent.keyDown(document.body, { key: 'S', shiftKey: true });
+    fireEvent.keyDown(document.body, { key: 's' });
 
     expect(handler).toHaveBeenCalledOnce();
   });

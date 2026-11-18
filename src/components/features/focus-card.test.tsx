@@ -136,25 +136,38 @@ describe('FocusCard', () => {
     expect(screen.queryByRole('button', { name: 'Reset' })).toBeNull();
   });
 
-  it('should start and pause with Shift+S', async () => {
+  it('should start and pause with S', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     setup(timeItem('Read'));
 
-    await user.keyboard('{Shift>}s{/Shift}');
+    await user.keyboard('s');
     expect(screen.getByRole('button', { name: 'Pause' })).toBeVisible();
 
-    await user.keyboard('{Shift>}s{/Shift}');
+    await user.keyboard('s');
     expect(screen.getByRole('button', { name: 'Resume' })).toBeVisible();
   });
 
-  it('should ignore Shift+S while typing in a field', async () => {
+  it('should show S in the timer button tooltip', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    setup(timeItem('Read'));
+    await user.hover(screen.getByRole('button', { name: 'Start' }));
+    advance(100);
+
+    expect(screen.getByRole('button', { name: 'Start' })).toHaveAttribute(
+      'aria-keyshortcuts',
+      's'
+    );
+    expect(screen.getByRole('tooltip', { hidden: true })).toHaveTextContent('S');
+  });
+
+  it('should ignore S while typing in a field', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     setup(timeItem('Read'));
     const field = document.createElement('input');
     document.body.append(field);
 
     field.focus();
-    await user.keyboard('{Shift>}s{/Shift}');
+    await user.keyboard('s');
     field.remove();
 
     expect(screen.getByRole('button', { name: 'Start' })).toBeVisible();

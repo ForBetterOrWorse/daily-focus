@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './app';
@@ -55,7 +55,7 @@ describe('App', () => {
         );
       }
       expect(screen.queryByRole('button', { name: 'settings' })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'keyboard shortcuts' })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'keyboard shortcuts' })).toBeInTheDocument();
       await waitFor(() => expect(document.title).toBe(`${heading} | Daily Focus`));
     }
   );
@@ -113,20 +113,21 @@ describe('App', () => {
   });
 
   describe('keyboard shortcuts dialog', () => {
-    it('should open on Shift+/ and list all four shortcuts', async () => {
+    it('should open from the navbar button and list the supported shortcuts', async () => {
       const user = userEvent.setup();
       renderApp();
 
-      await user.keyboard('{Shift>}/{/Shift}');
+      fireEvent.keyDown(document.body, { key: '?', shiftKey: true });
+      expect(screen.queryByRole('dialog', { name: 'Keyboard shortcuts' })).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'keyboard shortcuts' }));
 
       const dialog = screen.getByRole('dialog', { name: 'Keyboard shortcuts' });
       const rows = within(dialog)
         .getAllByRole('term')
         .map((term) => [term.textContent, term.nextElementSibling?.textContent]);
       expect(rows).toEqual([
-        ['Shift+/', 'Show keyboard shortcuts'],
-        ['Shift+S', 'Start or pause the timer'],
-        ['Shift+E', 'Add a task'],
+        ['S', 'Start or pause the timer'],
         ['\\', 'Show or hide Habits and Tasks (wide screens)'],
       ]);
     });

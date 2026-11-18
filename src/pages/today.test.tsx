@@ -111,17 +111,14 @@ describe('Today', () => {
     expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus();
   });
 
-  it('should open the new-task form with Shift+E and close it with Escape', async () => {
+  it('should not open the new-task form with Shift+E', async () => {
     const user = userEvent.setup();
     renderToday(setup());
 
     await user.keyboard('{Shift>}e{/Shift}');
-    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveFocus();
-    await user.keyboard('{Escape}');
-    fireEvent.animationEnd(screen.getByRole('dialog'));
 
+    expect(screen.queryByRole('textbox', { name: 'Name' })).not.toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'New task' })).toHaveFocus();
   });
 
   it('should not show quick sessions in either section', () => {
@@ -257,7 +254,18 @@ describe('Today', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('should open the columns when Shift+E opens the new-task form while they are closed', async () => {
+    it('should open the columns with the shortcut on the first visit', async () => {
+      const user = userEvent.setup();
+      const store = setup();
+      renderToday(store);
+
+      await user.keyboard('\\');
+
+      expect(screen.getByRole('heading', { name: 'Habits' })).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Habits and tasks' })).toHaveFocus();
+    });
+
+    it('should not open the columns with Shift+E', async () => {
       const user = userEvent.setup();
       const store = setup();
       store.dispatch({ type: 'setColumnsOpen', open: false });
@@ -265,8 +273,8 @@ describe('Today', () => {
 
       await user.keyboard('{Shift>}e{/Shift}');
 
-      expect(store.getState().data.meta.columnsOpen).toBe(true);
-      expect(screen.getByRole('heading', { name: 'Tasks' })).toBeVisible();
+      expect(store.getState().data.meta.columnsOpen).toBe(false);
+      expect(screen.queryByRole('heading', { name: 'Tasks' })).not.toBeInTheDocument();
     });
 
     it('should flip the toggle on each press and keep focus on it', async () => {
@@ -312,6 +320,5 @@ describe('Today', () => {
       );
       expect(screen.queryByRole('heading', { name: 'Habits' })).not.toBeInTheDocument();
     });
-
   });
 });

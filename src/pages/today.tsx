@@ -56,13 +56,6 @@ export function Today() {
   const invited = data.meta.columnsOpen === null;
   const { weekday, monthDay } = dateParts(day);
   useSeoMeta({ title: `Today | ${seoConfig.siteTitle}`, path: '/' });
-  useShortcut({ key: 'e', shift: true }, (event) => {
-    event.preventDefault();
-    if (wide && !shown) {
-      withViewTransition(() => dispatch({ type: 'setColumnsOpen', open: true }));
-    }
-    setDrawer({ section: 'tasks', view: 'form' });
-  });
   useShortcut(
     { key: '\\' },
     (event) => {

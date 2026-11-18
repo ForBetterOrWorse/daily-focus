@@ -65,6 +65,10 @@
   overflow: clip;
 }
 
+.columns-shortcut {
+  margin-inline-start: var(--space-xs);
+}
+
 .columns-control[data-variant='toggle'] .columns-label {
   grid-template-columns: minmax(0, 0fr);
   opacity: 0;

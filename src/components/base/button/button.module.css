@@ -113,6 +113,13 @@
   color: var(--color-bg-tertiary);
 }
 
+.primary:is(:hover, :active, [aria-expanded='true']):not([aria-disabled='true'], [aria-pressed])
+  kbd {
+  color: var(--color-bg-tertiary);
+  background-color: var(--color-fg-primary);
+  border-color: var(--color-bg-tertiary);
+}
+
 /* A toggle (`aria-pressed`) shows "on" with the state fill and a 2px state edge, the same as a
    chosen PillGroup pill. The ring widens inside the face, so the button keeps its size.
    Hovers lay the label color over the face, so an unpressed hover never looks pressed. */

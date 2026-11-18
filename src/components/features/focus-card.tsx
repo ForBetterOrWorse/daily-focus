@@ -3,6 +3,7 @@ import { Button } from '@/components/base/button/button';
 import { CheckLgIcon } from '@/components/base/icon';
 import pillStyles from '@/components/base/pill-group/pill-group.module.css';
 import { Stack } from '@/components/base/stack/stack';
+import { Tooltip } from '@/components/base/tooltip/tooltip';
 import { useToast } from '@/components/base/toast/toast-context';
 import { useAnnounce } from '@/components/features/live-announcer';
 import { currentClock, phaseDuration } from '@/domain/clock';
@@ -153,7 +154,7 @@ export function FocusCard({ item, now }: FocusCardProps) {
     dispatch(running ? { type: 'pause' } : { type: 'start', itemId });
   }
 
-  useShortcut({ key: 's', shift: true }, (event) => {
+  useShortcut({ key: 's' }, (event) => {
     event.preventDefault();
     toggle();
   });
@@ -334,14 +335,17 @@ export function FocusCard({ item, now }: FocusCardProps) {
               />
             )}
           </div>
-          <Button
-            variant="cta"
-            className={styles.hero}
-            data-paused={!running || undefined}
-            icon={running ? PauseFillIcon : PlayFillIcon}
-            aria-label={heroLabel}
-            onClick={toggle}
-          />
+          <Tooltip label={heroLabel} shortcut={['S']}>
+            <Button
+              variant="cta"
+              className={styles.hero}
+              data-paused={!running || undefined}
+              icon={running ? PauseFillIcon : PlayFillIcon}
+              aria-label={heroLabel}
+              aria-keyshortcuts="s"
+              onClick={toggle}
+            />
+          </Tooltip>
           <div
             className={styles['reset-slot']}
             data-visible={canReset || undefined}
