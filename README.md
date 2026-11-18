@@ -1,6 +1,10 @@
 # Daily Focus
 
-Daily Focus is a client-only app with a focus timer, habits, tasks, and a Stats page. All data lives in this browser's localStorage. There is no account and no server.
+A client-only timer and habit tracking app.
+
+## Data and backups
+
+Your preferences, focus sessions, habits, and tasks are stored in your browser's local storage. You can export or import a backup anytime.
 
 ## How to run
 
