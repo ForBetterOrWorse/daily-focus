@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { addDays, dayKeyOf, dayStart, splitAtDayBoundaries, weekdayOf, weekRange } from './days';
 
-const hour = 60 * 60 * 1000;
 const minute = 60 * 1000;
 
 describe('day helpers', () => {
