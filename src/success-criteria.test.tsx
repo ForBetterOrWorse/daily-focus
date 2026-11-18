@@ -181,12 +181,7 @@ async function goTo(page: keyof typeof PAGE_PATHS) {
   mountApp(mountedStore, PAGE_PATHS[page]);
 }
 
-async function addTimeItem(
-  user: User,
-  kind: 'task' | 'habit',
-  name: string,
-  minutes: number
-) {
+async function addTimeItem(user: User, kind: 'task' | 'habit', name: string, minutes: number) {
   await user.click(screen.getByRole('button', { name: `New ${kind}` }));
   const drawer = screen.getByRole('dialog', { name: `New ${kind}` });
   await user.type(within(drawer).getByRole('textbox', { name: 'Name' }), name);
@@ -321,7 +316,7 @@ describe('success criteria', () => {
       document.dispatchEvent(new Event('visibilitychange'));
     });
 
-    travelTo(Date.now() + 30 * MINUTE);
+    advance(30 * MINUTE);
     Reflect.deleteProperty(document, 'visibilityState');
     act(() => {
       document.dispatchEvent(new Event('visibilitychange'));
@@ -334,11 +329,31 @@ describe('success criteria', () => {
     expect(Math.abs(total - (30 * MINUTE + 1000))).toBeLessThanOrEqual(1000);
   });
 
+  it('should save only the time before the tab closed when a free run is reopened much later', async () => {
+    const { storage, user, unmount } = launchApp();
+    await user.click(screen.getByRole('button', { name: 'Start' }));
+    advance(10 * MINUTE);
+    unmount();
+    travelTo(Date.now() + 13 * HOUR);
+
+    launchApp({ storage: storage });
+
+    const data = savedData(storage);
+    expect(data.run).toBeNull();
+    expect(data.meta.autoStop).toBeNull();
+    expect(Math.abs(trackedMs(data) - 10 * MINUTE)).toBeLessThanOrEqual(30 * 1000);
+  });
+
   it('should stop a timer left running at exactly 12 hours and show the notice on the next visit', async () => {
     const { storage, user, unmount } = launchApp();
     await user.click(screen.getByRole('button', { name: 'Start' }));
     unmount();
     travelTo(Date.now() + 13 * HOUR);
+    const openApp = savedData(storage);
+    storage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ ...openApp, run: { ...openApp.run!, lastSeenAt: Date.now() - MINUTE } })
+    );
 
     launchApp({ storage: storage });
 

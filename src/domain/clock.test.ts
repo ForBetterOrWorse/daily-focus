@@ -9,6 +9,7 @@ import {
   restartClock,
   settleRun,
   startItem,
+  touchRun,
 } from './clock';
 import { reduce } from './reduce';
 
@@ -109,7 +110,8 @@ describe('timer clock', () => {
   it('should cap a settled free run at twelve hours and record the automatic stop', () => {
     const start = new Date(2024, 0, 1, 9).getTime();
     const running = startItem(dataWithTimeItems('read'), 'read', start);
-    const settled = settleRun(running, start + 13 * hour);
+    const open = { ...running, run: { ...running.run!, lastSeenAt: start + 13 * hour - minute } };
+    const settled = settleRun(open, start + 13 * hour);
 
     expect(settled.run).toBeNull();
     expect(settled.sessions.reduce((total, session) => total + session.durationMs, 0)).toBe(
@@ -302,5 +304,45 @@ describe('timer clock', () => {
     expect(paused.sessions[0].durationMs).toBe(minute);
     expect(restored).toBe(paused);
     expect(reduce(running, { type: 'settle' }, start + 12 * hour).run).toBeNull();
+  });
+});
+
+describe('stale free runs', () => {
+  const start = new Date(2024, 0, 1, 9).getTime();
+
+  it('should pause at the last heartbeat when the app was closed for a long time', () => {
+    const running = startItem(dataWithTimeItems('read'), 'read', start);
+    const beating = touchRun(running, start + 4 * minute);
+    const settled = settleRun(beating, start + 10 * hour);
+
+    expect(settled.run).toBeNull();
+    expect(settled.sessions.reduce((total, session) => total + session.durationMs, 0)).toBe(
+      4 * minute
+    );
+    expect(settled.meta.autoStop).toBeNull();
+  });
+
+  it('should keep counting after a short gap such as an accidental close', () => {
+    const running = startItem(dataWithTimeItems('read'), 'read', start);
+    const settled = settleRun(touchRun(running, start + 4 * minute), start + 7 * minute);
+
+    expect(settled.run).not.toBeNull();
+    expect(currentClock(settled, 'read', start + 7 * minute).elapsedMs).toBe(7 * minute);
+  });
+
+  it('should not let a heartbeat after a long gap erase the gap', () => {
+    const running = startItem(dataWithTimeItems('read'), 'read', start);
+    const beating = reduce(running, { type: 'heartbeat' }, start + 10 * hour);
+
+    expect(beating.run).toBeNull();
+    expect(beating.sessions).toEqual([]);
+  });
+
+  it('should keep the 12-hour cap for runs saved without a heartbeat', () => {
+    const running = startItem(dataWithTimeItems('read'), 'read', start);
+    const legacy = { ...running, run: { ...running.run!, lastSeenAt: undefined } };
+    const settled = settleRun(legacy, start + 13 * hour);
+
+    expect(settled.meta.autoStop).toEqual({ itemId: 'read', at: start + 12 * hour });
   });
 });

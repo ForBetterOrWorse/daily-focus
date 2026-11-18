@@ -10,6 +10,7 @@ import {
   type PhaseEnd,
 } from '@/domain/phase-end';
 import { claimAlert, readAlertPreferences } from '@/hooks/use-alert-preferences';
+import { useRunHeartbeat } from '@/hooks/use-run-heartbeat';
 import { useAppData, useDispatch, useNow, useTakeMissedPhaseEnd } from '@/store/use-app-data';
 import { playChime, unlockChime } from '@/utils/chime';
 import { formatClock } from '@/utils/format-clock';
@@ -50,6 +51,7 @@ export function PhaseAlerts(): null {
   const showToast = useToast();
   const takeMissedPhaseEnd = useTakeMissedPhaseEnd();
   const now = useNow(1000);
+  useRunHeartbeat();
   const [path] = useLocation();
   const previousData = useRef(data);
   const baseTitle = useRef('');

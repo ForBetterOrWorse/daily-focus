@@ -102,6 +102,10 @@ describe('createStore', () => {
     const { store } = makeStore(storage, start);
     store.dispatch({ type: 'newQuickSession', start: true, name: 'Writing' });
 
+    const saved = JSON.parse(storage.getItem(STORAGE_KEY)!);
+    saved.run.lastSeenAt = start + 13 * 60 * 60 * 1000 - 60 * 1000;
+    storage.setItem(STORAGE_KEY, JSON.stringify(saved));
+
     const { store: reloaded } = makeStore(storage, start + 13 * 60 * 60 * 1000);
     const data = reloaded.getState().data;
 

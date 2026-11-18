@@ -1,6 +1,6 @@
 import type { AppData, DayKey, TimerStyle } from './types';
 import { dropSkipsWithActivity, skipDay } from './activity';
-import { pauseRun, resetClock, settleRun, startItem } from './clock';
+import { pauseRun, resetClock, settleRun, startItem, touchRun } from './clock';
 import {
   addItem,
   deleteItem,
@@ -23,6 +23,7 @@ export type Action =
   | { type: 'pause' }
   | { type: 'reset'; itemId: string }
   | { type: 'settle' }
+  | { type: 'heartbeat' }
   | { type: 'addItem'; item: ItemInput }
   | { type: 'updateItem'; itemId: string; item: ItemInput }
   | { type: 'reorder'; section: ItemSection; ids: string[] }
@@ -54,6 +55,8 @@ function apply(data: AppData, action: Action, now: number): AppData {
       return resetClock(data, action.itemId, now);
     case 'settle':
       return settleRun(data, now);
+    case 'heartbeat':
+      return touchRun(data, now);
     case 'addItem':
       return addItem(data, action.item, now);
     case 'updateItem':

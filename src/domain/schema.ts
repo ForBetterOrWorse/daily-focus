@@ -282,6 +282,9 @@ function parseRun(value: unknown, path: string): Run | null {
   return {
     itemId: stringAt(run.itemId, `${path}.itemId`),
     startedAt: numberAt(run.startedAt, `${path}.startedAt`),
+    ...(run.lastSeenAt === undefined
+      ? {}
+      : { lastSeenAt: numberAt(run.lastSeenAt, `${path}.lastSeenAt`) }),
     clock: parseClock(run.clock, `${path}.clock`),
   };
 }

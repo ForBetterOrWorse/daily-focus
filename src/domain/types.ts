@@ -77,6 +77,8 @@ export interface ItemClock {
 export interface Run {
   itemId: string;
   startedAt: number;
+  /** Last time the app confirmed it was open. Absent on runs saved before heartbeats existed. */
+  lastSeenAt?: number;
   clock: ItemClock;
 }
 

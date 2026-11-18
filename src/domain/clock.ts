@@ -2,6 +2,8 @@ import { dayKeyOf, splitAtDayBoundaries } from './days';
 import type { AppData, ItemClock } from './types';
 
 const MAX_RUN_MS = 12 * 60 * 60 * 1000;
+export const HEARTBEAT_MS = 30 * 1000;
+const STALE_RUN_MS = 5 * 60 * 1000;
 const FOCUS_MS = 25 * 60 * 1000;
 const BREAK_MS = 5 * 60 * 1000;
 const LONG_BREAK_MS = 15 * 60 * 1000;
@@ -103,7 +105,7 @@ export function startItem(data: AppData, itemId: string, now: number): AppData {
     ...paused,
     cardItemId: endsPinnedItem ? null : itemId,
     clocks,
-    run: { itemId, startedAt: now, clock },
+    run: { itemId, startedAt: now, lastSeenAt: now, clock },
   };
 }
 
@@ -192,6 +194,10 @@ export function settleRun(data: AppData, now: number): AppData {
     return now >= phaseEndAt ? pauseRun(data, phaseEndAt) : data;
   }
 
+  if (run.lastSeenAt !== undefined && now - run.lastSeenAt > STALE_RUN_MS) {
+    return pauseRun(data, run.lastSeenAt);
+  }
+
   if (now - run.startedAt < MAX_RUN_MS) {
     return data;
   }
@@ -205,6 +211,14 @@ export function settleRun(data: AppData, now: number): AppData {
       autoStop: { itemId: run.itemId, at: settledAt },
     },
   };
+}
+
+export function touchRun(data: AppData, now: number): AppData {
+  const settled = settleRun(data, now);
+  if (settled.run === null) {
+    return settled;
+  }
+  return { ...settled, run: { ...settled.run, lastSeenAt: now } };
 }
 
 export function nextIntervalEnd(data: AppData, _now: number): number | null {
