@@ -57,8 +57,9 @@
   --dial-slack: calc(var(--dial-base) + var(--dial-grow) - var(--dial-full));
 
   inline-size: var(--dial-full);
-  margin-block-start: calc(var(--dial-slack) / 2);
-  margin-block-end: calc(var(--dial-base) - var(--dial-full) - var(--dial-slack) / 2);
+  margin-block:
+    calc(var(--dial-slack) / 2)
+    calc(var(--dial-base) - var(--dial-full) - var(--dial-slack) / 2);
 }
 
 .dial-svg {
@@ -77,11 +78,6 @@
   animation: fade-in var(--transition-base);
 }
 
-/* The orbit is animated on its own, so a transition would only lag behind it and drift on pause. */
-.dial-trace-group[data-orbit] .dial-trace {
-  transition: none;
-}
-
 .dial-track,
 .dial-trace {
   fill: none;
@@ -97,6 +93,11 @@
   transition:
     stroke-dasharray var(--trace-step),
     stroke-dashoffset var(--trace-step);
+}
+
+/* The orbit is animated on its own, so a transition would only lag behind it and drift on pause. */
+.dial-trace-group[data-orbit] .dial-trace {
+  transition: none;
 }
 
 .dial-center {
